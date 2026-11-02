@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>تسجيل مبيعات المحل | إلكترو نور الدين</title>
+  <title>تسجيل مبيعات ومخزون المحل | إلكترو نور الدين</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -73,7 +73,7 @@
         <div class="flex items-center gap-2">
           <!-- Active Seller Selector (نورالدين، ايوب، عبد الله) -->
           <div class="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
-            <span class="text-[11px] text-slate-400 px-1 hidden sm:inline">البائع:</span>
+            <span class="text-[11px] text-slate-400 px-1 hidden sm:inline">أنا:</span>
             <select id="seller-select" class="bg-slate-900 text-white text-xs font-bold rounded px-1.5 py-1 outline-none border border-slate-700">
               <option value="نورالدين" selected>نورالدين</option>
               <option value="ايوب">ايوب</option>
@@ -90,6 +90,20 @@
         </div>
 
       </div>
+
+      <!-- Navigation Bar between Pages: 1. المبيعات | 2. السلعة لي خاصانا (المخزون) -->
+      <nav class="flex items-center gap-2 pt-2.5 mt-2 border-t border-slate-800 text-xs font-black">
+        <button id="nav-btn-sales" class="page-nav-btn active flex-1 py-1.5 rounded-lg bg-emerald-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition">
+          <span>🛍️</span>
+          <span>تسجيل المبيعات (Ventes)</span>
+        </button>
+        <button id="nav-btn-stock" class="page-nav-btn flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1.5 transition">
+          <span>📦</span>
+          <span>السلعة لي خاصانا (المخزون)</span>
+          <span id="badge-needed-stock-count" class="bg-amber-500 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">0</span>
+        </button>
+      </nav>
+
     </div>
   </header>
 
@@ -105,142 +119,237 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-4 space-y-4">
 
-    <!-- KPI Summary Bar (مبيعات ومداخيل اليوم تظهر للمدير فقط) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-      
-      <!-- مدخول اليوم (خاص بالمدير) -->
-      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-center relative overflow-hidden">
-        <div class="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-bold mb-0.5">
-          <span>مجموع مدخول اليوم</span>
-          <span class="text-[9px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-black">خاص بالمدير</span>
+    <!-- ======================================================== -->
+    <!-- VIEW 1: صفحة تسجيل المبيعات (SALES PAGE) -->
+    <!-- ======================================================== -->
+    <div id="view-sales-page" class="space-y-4 block">
+
+      <!-- KPI Summary Bar (مبيعات ومداخيل اليوم تظهر للمدير فقط) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        
+        <!-- مدخول اليوم (خاص بالمدير) -->
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-center relative overflow-hidden">
+          <div class="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-bold mb-0.5">
+            <span>مجموع مدخول اليوم</span>
+            <span class="text-[9px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-black">خاص بالمدير</span>
+          </div>
+          <div id="kpi-today-money-wrap">
+            <span id="kpi-today-money" class="text-lg sm:text-xl font-black text-emerald-600 hidden">0 DH</span>
+            <button id="unlock-today-money-btn" class="text-xs font-black text-slate-500 hover:text-amber-700 bg-slate-100 hover:bg-amber-50 px-2.5 py-1 rounded-lg border border-slate-200 transition inline-flex items-center gap-1 mt-1">
+              <span>🔒</span> <span>أدخل PIN للمشاهدة</span>
+            </button>
+          </div>
         </div>
-        <div id="kpi-today-money-wrap">
-          <span id="kpi-today-money" class="text-lg sm:text-xl font-black text-emerald-600 hidden">0 DH</span>
-          <button id="unlock-today-money-btn" class="text-xs font-black text-slate-500 hover:text-amber-700 bg-slate-100 hover:bg-amber-50 px-2.5 py-1 rounded-lg border border-slate-200 transition inline-flex items-center gap-1 mt-1">
-            <span>🔒</span> <span>أدخل PIN للمشاهدة</span>
+
+        <!-- القطع المباعة اليوم (ظاهرة للجميع) -->
+        <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <span class="text-[11px] text-slate-500 font-bold block">القطع المباعة اليوم</span>
+          <span id="kpi-today-count" class="text-lg sm:text-xl font-black text-blue-600">0 قطعة</span>
+        </div>
+
+        <!-- إجمالي كل المبيعات (خاص بالمدير) -->
+        <div class="col-span-2 sm:col-span-1 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <div class="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-bold mb-0.5">
+            <span>إجمالي المداخيل</span>
+            <span class="text-[9px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-black">خاص بالمدير</span>
+          </div>
+          <div id="kpi-total-money-wrap">
+            <span id="kpi-total-money" class="text-lg sm:text-xl font-black text-slate-800 hidden">0 DH</span>
+            <span id="kpi-total-money-locked" class="text-xs font-black text-slate-400 block mt-1">🔒 مخفي عن الموظفين</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- تسجيل بيع جديد -->
+      <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
+        <div class="flex items-center justify-between">
+          <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
+            <span class="text-emerald-600 text-lg">⚡</span>
+            <span>قيد بيع جديد (سريع وبسيط)</span>
+          </h2>
+          <span class="text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-medium">تسجيل وحفظ سحابي فوري</span>
+        </div>
+
+        <!-- Quick Pick Suggestions (Chips for fast entry) -->
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 mb-1.5">اختر بسرعة أو اكتب لتحت:</label>
+          <div id="quick-products-chips" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
+            <!-- Dynamically populated chips -->
+          </div>
+        </div>
+
+        <!-- Simple Entry Form -->
+        <form id="sale-form" class="space-y-3">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <!-- Item Name / Type -->
+            <div class="sm:col-span-6">
+              <label class="block text-xs font-bold text-slate-700 mb-1">النوع / اسم السلعة (مثلاً: افشور a12، شاحن...):</label>
+              <input type="text" id="input-item-name" placeholder="اكتب مثلا: افشور a12" required
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition">
+            </div>
+
+            <!-- Price -->
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1">الثمن (DH):</label>
+              <input type="number" id="input-item-price" placeholder="مثلا: 250" min="0" step="any" required
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-emerald-700 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition">
+            </div>
+
+            <!-- Quantity -->
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1">الكمية:</label>
+              <div class="flex items-center">
+                <button type="button" id="btn-dec-qty" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-r-xl font-bold border border-slate-300 flex items-center justify-center text-lg">-</button>
+                <input type="number" id="input-item-qty" value="1" min="1" class="w-full h-10 text-center bg-slate-50 border-y border-slate-300 text-sm font-black text-slate-800 outline-none">
+                <button type="button" id="btn-inc-qty" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-l-xl font-bold border border-slate-300 flex items-center justify-center text-lg">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Big Submit Button -->
+          <button type="submit" id="btn-submit-sale" class="w-full py-3 sm:py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+            <span>💾</span>
+            <span>قيد البيع دابا (حفظ فوري فالسحابة وكل الهواتف)</span>
           </button>
-        </div>
-      </div>
 
-      <!-- القطع المباعة اليوم (ظاهرة للجميع) -->
-      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-center">
-        <span class="text-[11px] text-slate-500 font-bold block">القطع المباعة اليوم</span>
-        <span id="kpi-today-count" class="text-lg sm:text-xl font-black text-blue-600">0 قطعة</span>
-      </div>
+        </form>
+      </section>
 
-      <!-- إجمالي كل المبيعات (خاص بالمدير) -->
-      <div class="col-span-2 sm:col-span-1 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-center">
-        <div class="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-bold mb-0.5">
-          <span>إجمالي المداخيل</span>
-          <span class="text-[9px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-black">خاص بالمدير</span>
+      <!-- تجميع وحساب السلع المباعة -->
+      <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
+              <span>📊</span>
+              <span>شحال تباع من كل نوع (المجموع التراكمي)</span>
+            </h2>
+            <p class="text-xs text-slate-500">يحسب لك تلقائياً شحال تباع من كل سلعة (مثلا: تباعو 2 افشور a12)</p>
+          </div>
+
+          <!-- Time Filter for Totals -->
+          <div class="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs font-bold">
+            <button id="filter-totals-all" class="totals-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs">الكل</button>
+            <button id="filter-totals-today" class="totals-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900">اليوم فقط</button>
+          </div>
         </div>
-        <div id="kpi-total-money-wrap">
-          <span id="kpi-total-money" class="text-lg sm:text-xl font-black text-slate-800 hidden">0 DH</span>
-          <span id="kpi-total-money-locked" class="text-xs font-black text-slate-400 block mt-1">🔒 مخفي عن الموظفين</span>
+
+        <!-- Items Count Grid / Cards -->
+        <div id="aggregated-items-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="col-span-full text-center py-6 text-slate-400 text-xs">
+            خاوي حالياً (0 مبيعات). قيد أول سلعة الفوق باش يبانو الحسابات هنا!
+          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- سجل آخر المبيعات -->
+      <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
+            <span>🕒</span>
+            <span>سجل العمليات بالترتيب</span>
+          </h2>
+          <span id="sales-badge-count" class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">0 عملية</span>
+        </div>
+
+        <!-- Sales List -->
+        <div id="sales-list-container" class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+          <div class="text-center py-8 text-slate-400 text-xs">
+            السجل خاوي دابا (0 مبيعات).
+          </div>
+        </div>
+      </section>
 
     </div>
 
-    <!-- ==================== SECTION 1: تسجيل بيع جديد ==================== -->
-    <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
-      <div class="flex items-center justify-between">
-        <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
-          <span class="text-emerald-600 text-lg">⚡</span>
-          <span>قيد بيع جديد (سريع وبسيط)</span>
-        </h2>
-        <span class="text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-medium">تسجيل وحفظ سحابي فوري</span>
-      </div>
+    <!-- ======================================================== -->
+    <!-- VIEW 2: صفحة إدارة المخزون / السلعة لي خاصانا (STOCK PAGE) -->
+    <!-- ======================================================== -->
+    <div id="view-stock-page" class="space-y-4 hidden">
 
-      <!-- Quick Pick Suggestions (Chips for fast entry) -->
-      <div>
-        <label class="block text-[11px] font-bold text-slate-500 mb-1.5">اختر بسرعة أو اكتب لتحت:</label>
-        <div id="quick-products-chips" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-          <!-- Dynamically populated chips -->
+      <!-- Stock Header Card -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
+              <span class="text-amber-500 text-xl">📦</span>
+              <span>لائحة السلعة لي خاصانا (المخزون وقطع الغيار)</span>
+            </h2>
+            <p class="text-xs text-slate-500">
+              قيد أي سلعة تقاضات أو خاصا المحل هنا؛ كتبان فالحين عند المدير فالبيسي وتليفونات الخدامة!
+            </p>
+          </div>
+
+          <!-- Copy to WhatsApp Button -->
+          <button id="copy-whatsapp-stock-btn" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
+            <span>📋</span>
+            <span>نسخ اللائحة للواتساب</span>
+          </button>
         </div>
-      </div>
 
-      <!-- Simple Entry Form -->
-      <form id="sale-form" class="space-y-3">
-        
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-          <!-- Item Name / Type -->
-          <div class="sm:col-span-6">
-            <label class="block text-xs font-bold text-slate-700 mb-1">النوع / اسم السلعة (مثلاً: افشور a12، شاحن...):</label>
-            <input type="text" id="input-item-name" placeholder="اكتب مثلا: افشور a12" required
-              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition">
-          </div>
-
-          <!-- Price -->
-          <div class="sm:col-span-3">
-            <label class="block text-xs font-bold text-slate-700 mb-1">الثمن (DH):</label>
-            <input type="number" id="input-item-price" placeholder="مثلا: 250" min="0" step="any" required
-              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-emerald-700 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition">
-          </div>
-
-          <!-- Quantity -->
-          <div class="sm:col-span-3">
-            <label class="block text-xs font-bold text-slate-700 mb-1">الكمية:</label>
-            <div class="flex items-center">
-              <button type="button" id="btn-dec-qty" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-r-xl font-bold border border-slate-300 flex items-center justify-center text-lg">-</button>
-              <input type="number" id="input-item-qty" value="1" min="1" class="w-full h-10 text-center bg-slate-50 border-y border-slate-300 text-sm font-black text-slate-800 outline-none">
-              <button type="button" id="btn-inc-qty" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-l-xl font-bold border border-slate-300 flex items-center justify-center text-lg">+</button>
+        <!-- Form: Note down missing item -->
+        <form id="stock-form" class="space-y-3 pt-2 border-t border-slate-100">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            
+            <!-- Missing Item Name -->
+            <div class="sm:col-span-6">
+              <label class="block text-xs font-bold text-slate-700 mb-1">السلعة أو القطعة لي خاصانا:</label>
+              <input type="text" id="input-stock-name" placeholder="مثلا: شاشات A12، بطاريات iPhone 11، شواحن 20W..." required
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition">
             </div>
+
+            <!-- Quantity Needed -->
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1">شحال خاصنا (الكمية):</label>
+              <input type="number" id="input-stock-qty" value="1" min="1" placeholder="مثلا: 3" required
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-amber-700 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition">
+            </div>
+
+            <!-- Priority / Urgency -->
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1">درجة الأهمية:</label>
+              <select id="input-stock-priority" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:bg-white">
+                <option value="عادي">عادي 🟢</option>
+                <option value="مستعجل بزاف">مستعجل بزاف 🔴</option>
+                <option value="طلب زبون">طلب خاص لزبون 🟡</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-black text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-[0.98]">
+            <span>➕</span>
+            <span>قيد فهاد اللائحة (تطلع عند المدير وكل التليفونات)</span>
+          </button>
+        </form>
+
+      </div>
+
+      <!-- Missing Stock List -->
+      <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <h3 class="font-extrabold text-base text-slate-800">السلع المطلوبة حالياً:</h3>
+            <span id="stock-list-counter" class="text-xs bg-amber-100 text-amber-900 font-black px-2 py-0.5 rounded-full">0 سلعة</span>
+          </div>
+
+          <!-- Filter: Pending vs Purchased -->
+          <div class="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs font-bold">
+            <button id="filter-stock-pending" class="stock-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs">مازال خاصة ⏳</button>
+            <button id="filter-stock-bought" class="stock-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900">تشراَت ✅</button>
           </div>
         </div>
 
-        <!-- Big Submit Button -->
-        <button type="submit" id="btn-submit-sale" class="w-full py-3 sm:py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition active:scale-[0.98]">
-          <span>💾</span>
-          <span>قيد البيع دابا (حفظ فوري فالسحابة وكل الهواتف)</span>
-        </button>
-
-      </form>
-    </section>
-
-    <!-- ==================== SECTION 2: تجميع وحساب السلع المباعة ==================== -->
-    <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3">
-      <div class="flex items-center justify-between flex-wrap gap-2">
-        <div>
-          <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
-            <span>📊</span>
-            <span>شحال تباع من كل نوع (المجموع التراكمي)</span>
-          </h2>
-          <p class="text-xs text-slate-500">يحسب لك تلقائياً شحال تباع من كل سلعة (مثلا: تباعو 2 افشور a12)</p>
+        <div id="stock-items-container" class="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
+          <div class="text-center py-8 text-slate-400 text-xs">
+            ما كاينا حتى سلعة مقيدة بلي خاصانا حالياً. المخزون واجد!
+          </div>
         </div>
+      </section>
 
-        <!-- Time Filter for Totals -->
-        <div class="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs font-bold">
-          <button id="filter-totals-all" class="totals-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs">الكل</button>
-          <button id="filter-totals-today" class="totals-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900">اليوم فقط</button>
-        </div>
-      </div>
-
-      <!-- Items Count Grid / Cards -->
-      <div id="aggregated-items-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div class="col-span-full text-center py-6 text-slate-400 text-xs">
-          خاوي حالياً (0 مبيعات). قيد أول سلعة الفوق باش يبانو الحسابات هنا!
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== SECTION 3: سجل آخر المبيعات ==================== -->
-    <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
-          <span>🕒</span>
-          <span>سجل العمليات بالترتيب</span>
-        </h2>
-        <span id="sales-badge-count" class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">0 عملية</span>
-      </div>
-
-      <!-- Sales List -->
-      <div id="sales-list-container" class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-        <div class="text-center py-8 text-slate-400 text-xs">
-          السجل خاوي دابا (0 مبيعات).
-        </div>
-      </div>
-    </section>
+    </div>
 
   </main>
 
@@ -314,7 +423,7 @@
           </div>
         </div>
 
-        <!-- Change PIN Option (Strictly updates code and prevents old code from working) -->
+        <!-- Change PIN Option -->
         <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
           <span class="text-slate-500 font-bold">تغيير رمز PIN السري:</span>
           <div class="flex items-center gap-1">
@@ -360,7 +469,7 @@
     (function() {
       'use strict';
 
-      // Secure PIN Hash Helper (so plain PIN is never exposed to members or over network)
+      // Secure PIN Hash Helper
       function hashPin(pinStr) {
         if (!pinStr) return '';
         let hash = 5381;
@@ -373,11 +482,12 @@
 
       // Storage Keys
       const STORAGE_KEYS = {
-        SALES: 'electro_simple_sales_v3',
-        PRESETS: 'electro_simple_presets_v3',
-        PIN_HASH: 'electro_simple_pinhash_v3',
-        SELLER: 'electro_simple_seller_v3',
-        LAST_SYNC_TS: 'electro_simple_last_sync_v3'
+        SALES: 'electro_simple_sales_v4',
+        STOCK_NEEDS: 'electro_simple_stock_needs_v4',
+        PRESETS: 'electro_simple_presets_v4',
+        PIN_HASH: 'electro_simple_pinhash_v4',
+        SELLER: 'electro_simple_seller_v4',
+        LAST_SYNC_TS: 'electro_simple_last_sync_v4'
       };
 
       // Initial Default Presets
@@ -399,14 +509,17 @@
 
       // App State
       const state = {
+        currentView: 'sales', // 'sales' or 'stock'
         sales: [],
+        stockNeeds: [], // List of items needed / out of stock
         presets: DEFAULT_PRESETS,
-        pinHash: DEFAULT_PIN_HASH, // Stored as secure hash, old PIN never works after change!
+        pinHash: DEFAULT_PIN_HASH,
         currentSeller: 'نورالدين',
         lastUpdated: 0,
-        roomCode: 'iliktronds_shop_cloud_v3',
+        roomCode: 'iliktronds_shop_cloud_v4',
         totalsFilter: 'all',
-        isManagerUnlocked: false, // Flag indicating if manager PIN is verified
+        stockFilter: 'pending', // 'pending' or 'bought'
+        isManagerUnlocked: false,
         mqttClient: null
       };
 
@@ -414,14 +527,13 @@
       function loadLocalState() {
         try {
           const storedSales = localStorage.getItem(STORAGE_KEYS.SALES);
-          if (storedSales) {
-            state.sales = JSON.parse(storedSales);
-          }
+          if (storedSales) state.sales = JSON.parse(storedSales);
+
+          const storedStock = localStorage.getItem(STORAGE_KEYS.STOCK_NEEDS);
+          if (storedStock) state.stockNeeds = JSON.parse(storedStock);
 
           const storedPresets = localStorage.getItem(STORAGE_KEYS.PRESETS);
-          if (storedPresets) {
-            state.presets = JSON.parse(storedPresets);
-          }
+          if (storedPresets) state.presets = JSON.parse(storedPresets);
 
           const storedPinHash = localStorage.getItem(STORAGE_KEYS.PIN_HASH);
           if (storedPinHash && storedPinHash.trim() !== '') {
@@ -436,9 +548,7 @@
           }
 
           const storedTs = localStorage.getItem(STORAGE_KEYS.LAST_SYNC_TS);
-          if (storedTs) {
-            state.lastUpdated = parseInt(storedTs, 10) || 0;
-          }
+          if (storedTs) state.lastUpdated = parseInt(storedTs, 10) || 0;
         } catch (e) {
           console.error('LocalStorage load error:', e);
         }
@@ -448,6 +558,7 @@
         try {
           state.lastUpdated = Date.now();
           localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(state.sales));
+          localStorage.setItem(STORAGE_KEYS.STOCK_NEEDS, JSON.stringify(state.stockNeeds));
           localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(state.presets));
           localStorage.setItem(STORAGE_KEYS.PIN_HASH, state.pinHash);
           localStorage.setItem(STORAGE_KEYS.SELLER, state.currentSeller);
@@ -478,41 +589,36 @@
         }, 3200);
       }
 
-      // Verify PIN strictly against current active pinHash
       function verifyEnteredPin(entered) {
         if (!entered) return false;
-        // Strictly check hash against state.pinHash only! Old pins NEVER match!
         return hashPin(entered.trim()) === state.pinHash;
       }
 
       // ==========================================
-      // 2. PERMANENT CLOUD RETAIN SYNC (MQTT Retain & Multi-Device)
+      // 2. PERMANENT CLOUD RETAIN SYNC (MQTT Retain)
       // ==========================================
       function setupRealtimeSync() {
         const syncDot = document.getElementById('sync-dot');
         const syncStatus = document.getElementById('sync-status');
         const topic = `electro_noureddine_store/${state.roomCode}/state`;
 
-        // Local BroadcastChannel for instant multi-tab sync on same phone/PC
         let localChannel = null;
         try {
-          localChannel = new BroadcastChannel('electro_local_channel_v3');
+          localChannel = new BroadcastChannel('electro_local_channel_v4');
           localChannel.onmessage = (e) => {
             if (e.data && e.data.type === 'FULL_SYNC') {
               applyIncomingState(e.data.payload, false);
             }
           };
         } catch (err) {
-          // BroadcastChannel unsupported
+          // Unsupported
         }
 
-        // Apply incoming state from Cloud or other phone
         function applyIncomingState(payload, fromNetwork = true) {
           if (!payload) return;
-          
           let changed = false;
 
-          // Sync PIN Hash securely (plain PIN is never transmitted)
+          // Sync PIN Hash
           if (payload.pinHash && typeof payload.pinHash === 'string' && payload.pinHash.trim() !== '') {
             if (state.pinHash !== payload.pinHash.trim()) {
               state.pinHash = payload.pinHash.trim();
@@ -537,20 +643,29 @@
             }
           }
 
+          // Sync Stock Needs (Missing Items)
+          if (Array.isArray(payload.stockNeeds)) {
+            if (JSON.stringify(payload.stockNeeds) !== JSON.stringify(state.stockNeeds)) {
+              state.stockNeeds = payload.stockNeeds;
+              try { localStorage.setItem(STORAGE_KEYS.STOCK_NEEDS, JSON.stringify(state.stockNeeds)); } catch(e){}
+              changed = true;
+            }
+          }
+
           if (changed) {
             renderAll();
             if (fromNetwork) {
-              showToast('تمت مزامنة المبيعات من السحابة ☁️');
+              showToast('تمت مزامنة المبيعات والمخزون من السحابة ☁️');
             }
           }
         }
 
-        // Publish full state to Cloud with RETAIN = true
         function broadcastStateToCloud() {
           const payload = {
             sales: state.sales,
+            stockNeeds: state.stockNeeds,
             presets: state.presets,
-            pinHash: state.pinHash, // Send hash only, members never see the PIN!
+            pinHash: state.pinHash,
             updatedBy: state.currentSeller,
             timestamp: Date.now()
           };
@@ -570,7 +685,6 @@
 
         state.syncToCloud = broadcastStateToCloud;
 
-        // Connect to MQTT Broker over WebSockets
         try {
           const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
           const client = mqtt.connect(brokerUrl, {
@@ -583,13 +697,8 @@
           state.mqttClient = client;
 
           client.on('connect', () => {
-            if (syncDot) {
-              syncDot.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-            }
-            if (syncStatus) {
-              syncStatus.textContent = 'سحابة متصلة ومتزامنة ☁️';
-            }
-
+            if (syncDot) syncDot.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
+            if (syncStatus) syncStatus.textContent = 'سحابة متصلة ومتزامنة ☁️';
             client.subscribe(topic, { qos: 1 });
           });
 
@@ -597,8 +706,7 @@
             try {
               const data = JSON.parse(message.toString());
               if (!data) return;
-
-              if (data.sales || data.pinHash) {
+              if (data.sales || data.stockNeeds || data.pinHash) {
                 applyIncomingState(data, true);
               }
             } catch (err) {
@@ -616,7 +724,255 @@
       }
 
       // ==========================================
-      // 3. UI RENDERING & AGGREGATION
+      // 3. PAGE NAVIGATION (SALES vs STOCK)
+      // ==========================================
+      function setupPageNavigation() {
+        const btnSales = document.getElementById('nav-btn-sales');
+        const btnStock = document.getElementById('nav-btn-stock');
+        const viewSales = document.getElementById('view-sales-page');
+        const viewStock = document.getElementById('view-stock-page');
+
+        if (btnSales && btnStock) {
+          btnSales.addEventListener('click', () => {
+            state.currentView = 'sales';
+            btnSales.className = 'page-nav-btn active flex-1 py-1.5 rounded-lg bg-emerald-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition';
+            btnStock.className = 'page-nav-btn flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1.5 transition';
+            viewSales.classList.remove('hidden');
+            viewStock.classList.add('hidden');
+          });
+
+          btnStock.addEventListener('click', () => {
+            state.currentView = 'stock';
+            btnStock.className = 'page-nav-btn active flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center gap-1.5 shadow-sm transition font-black';
+            btnSales.className = 'page-nav-btn flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1.5 transition';
+            viewStock.classList.remove('hidden');
+            viewSales.classList.add('hidden');
+            renderStockSection();
+          });
+        }
+      }
+
+      // ==========================================
+      // 4. INVENTORY / MISSING STOCK SECTION
+      // ==========================================
+      function setupStockSection() {
+        const form = document.getElementById('stock-form');
+        const inputName = document.getElementById('input-stock-name');
+        const inputQty = document.getElementById('input-stock-qty');
+        const inputPriority = document.getElementById('input-stock-priority');
+        const filterPending = document.getElementById('filter-stock-pending');
+        const filterBought = document.getElementById('filter-stock-bought');
+        const copyWhatsappBtn = document.getElementById('copy-whatsapp-stock-btn');
+
+        if (form) {
+          form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = (inputName.value || '').trim();
+            const qty = Math.max(1, parseInt(inputQty.value || 1, 10));
+            const priority = inputPriority.value || 'عادي';
+
+            if (!name) {
+              showToast('يرجى كتابة اسم السلعة المطلوبة!', true);
+              inputName.focus();
+              return;
+            }
+
+            const newStockItem = {
+              id: 'STK-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+              name: name,
+              qty: qty,
+              priority: priority,
+              addedBy: state.currentSeller,
+              date: new Date().toISOString(),
+              status: 'pending' // 'pending' or 'bought'
+            };
+
+            state.stockNeeds.unshift(newStockItem);
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+
+            showToast(`تم تقييد "${name}" فلائحة السلعة لي خاصانا بنجاح! 📦`);
+            inputName.value = '';
+            inputQty.value = '1';
+            inputName.focus();
+            renderStockSection();
+          });
+        }
+
+        if (filterPending && filterBought) {
+          filterPending.addEventListener('click', () => {
+            state.stockFilter = 'pending';
+            filterPending.className = 'stock-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs font-bold';
+            filterBought.className = 'stock-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold';
+            renderStockSection();
+          });
+
+          filterBought.addEventListener('click', () => {
+            state.stockFilter = 'bought';
+            filterBought.className = 'stock-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs font-bold';
+            filterPending.className = 'stock-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold';
+            renderStockSection();
+          });
+        }
+
+        if (copyWhatsappBtn) {
+          copyWhatsappBtn.addEventListener('click', () => {
+            const pending = state.stockNeeds.filter(item => item.status !== 'bought');
+            if (pending.length === 0) {
+              showToast('ما كاينا حتى سلعة خاصة حالياً لنسخها!', true);
+              return;
+            }
+
+            let msg = `📦 *لائحة السلعة لي خاصا محل إلكترو نور الدين:*\n`;
+            msg += `📅 التاريخ: ${new Date().toLocaleDateString('ar-MA')}\n\n`;
+
+            pending.forEach((item, idx) => {
+              const pMark = item.priority === 'مستعجل بزاف' ? '🔴' : item.priority === 'طلب زبون' ? '🟡' : '🔹';
+              msg += `${idx + 1}. ${pMark} *${item.name}* (الكمية: ${item.qty})\n`;
+            });
+
+            msg += `\n_تم إرسالها من تطبيق إلكترو نور الدين_`;
+
+            // Copy to clipboard with fallback
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(msg).then(() => {
+                showToast('تم نسخ لائحة السلعة بنجاح! دير ليها Coller فالواتساب 📋');
+              }).catch(() => {
+                fallbackCopy(msg);
+              });
+            } else {
+              fallbackCopy(msg);
+            }
+          });
+        }
+      }
+
+      function fallbackCopy(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+          document.execCommand('copy');
+          showToast('تم نسخ لائحة السلعة بنجاح! دير ليها Coller فالواتساب 📋');
+        } catch(e) {
+          showToast('تعذر النسخ التلقائي', true);
+        }
+        document.body.removeChild(temp);
+      }
+
+      function renderStockSection() {
+        const container = document.getElementById('stock-items-container');
+        const counter = document.getElementById('stock-list-counter');
+        const badgeCount = document.getElementById('badge-needed-stock-count');
+        if (!container) return;
+
+        const pendingItems = state.stockNeeds.filter(item => item.status !== 'bought');
+        if (badgeCount) badgeCount.textContent = pendingItems.length;
+
+        const displayedItems = state.stockNeeds.filter(item => {
+          if (state.stockFilter === 'bought') return item.status === 'bought';
+          return item.status !== 'bought';
+        });
+
+        if (counter) {
+          counter.textContent = `${displayedItems.length} سلعة`;
+        }
+
+        if (displayedItems.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-8 text-slate-400 text-xs">
+              ${state.stockFilter === 'bought' ? 'لا توجد سلع مشتراة في الأرشيف.' : 'ما كاينا حتى سلعة مقيدة بلي خاصانا حالياً. المخزون واجد!'}
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = displayedItems.map(item => {
+          const isBought = item.status === 'bought';
+          const pBadge = item.priority === 'مستعجل بزاف' 
+            ? '<span class="bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded text-[10px]">مستعجل 🔴</span>'
+            : item.priority === 'طلب زبون'
+            ? '<span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px]">طلب زبون 🟡</span>'
+            : '<span class="bg-slate-100 text-slate-600 font-semibold px-1.5 py-0.5 rounded text-[10px]">عادي</span>';
+
+          const dateStr = new Date(item.date).toLocaleDateString('ar-MA', { day: 'numeric', month: 'short' });
+
+          return `
+            <div class="py-2.5 flex items-center justify-between gap-2 text-xs ${isBought ? 'opacity-60 bg-slate-50/50' : ''}">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="font-extrabold text-slate-800 text-sm truncate ${isBought ? 'line-through text-slate-500' : ''}">${item.name}</h4>
+                  <span class="bg-amber-100 text-amber-900 font-black text-xs px-2 py-0.5 rounded-lg">خاصنا: ${item.qty} قطع</span>
+                  ${pBadge}
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5">قيدها: <strong class="text-slate-600">${item.addedBy || 'المحل'}</strong> | ${dateStr}</p>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                ${!isBought ? `
+                  <button class="mark-bought-btn px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-black rounded-lg text-xs transition flex items-center gap-1"
+                    data-id="${item.id}" title="تم الشراء وإدخالها للمحل">
+                    <span>✅</span> <span>تشراَت</span>
+                  </button>
+                ` : `
+                  <button class="unmark-bought-btn px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-[10px]"
+                    data-id="${item.id}" title="إرجاع إلى قائمة السلع المطلوبة">
+                    <span>↩️</span> إرجاع
+                  </button>
+                `}
+
+                <button class="delete-stock-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-xs transition"
+                  data-id="${item.id}" title="حذف">
+                  ✕
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Attach listeners for stock item actions
+        container.querySelectorAll('.mark-bought-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.stockNeeds.find(i => i.id === id);
+            if (item) {
+              item.status = 'bought';
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+              showToast(`تم التأشير على "${item.name}" بأنها تشراَت ودخلات للمخزون ✅`);
+              renderStockSection();
+            }
+          });
+        });
+
+        container.querySelectorAll('.unmark-bought-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.stockNeeds.find(i => i.id === id);
+            if (item) {
+              item.status = 'pending';
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+              renderStockSection();
+            }
+          });
+        });
+
+        container.querySelectorAll('.delete-stock-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            state.stockNeeds = state.stockNeeds.filter(i => i.id !== id);
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+            showToast('تم حذف البند من لائحة السلع');
+            renderStockSection();
+          });
+        });
+      }
+
+      // ==========================================
+      // 5. SALES UI RENDERING & AGGREGATION
       // ==========================================
       function renderPresets() {
         const chipsContainer = document.getElementById('quick-products-chips');
@@ -663,7 +1019,6 @@
         }
       }
 
-      // Render KPIs (Today's Money strictly visible to Manager only!)
       function renderKPIs() {
         const todayStr = new Date().toDateString();
 
@@ -674,7 +1029,6 @@
 
         const totalMoney = state.sales.reduce((acc, s) => acc + (s.totalPrice || 0), 0);
 
-        // Item count is visible to everyone
         document.getElementById('kpi-today-count').textContent = `${todayCount} قطعة`;
 
         const todayMoneyEl = document.getElementById('kpi-today-money');
@@ -683,9 +1037,7 @@
         const totalMoneyLocked = document.getElementById('kpi-total-money-locked');
         const managerLockIcon = document.getElementById('manager-lock-icon');
 
-        // Check if Manager is unlocked
         if (state.isManagerUnlocked) {
-          // Reveal money to manager
           todayMoneyEl.textContent = `${todayMoney} DH`;
           todayMoneyEl.classList.remove('hidden');
           unlockBtn.classList.add('hidden');
@@ -696,7 +1048,6 @@
 
           if (managerLockIcon) managerLockIcon.textContent = '👑';
         } else {
-          // Hide money from members / staff
           todayMoneyEl.classList.add('hidden');
           unlockBtn.classList.remove('hidden');
 
@@ -743,7 +1094,6 @@
         const sortedGroups = Object.values(groups).sort((a, b) => b.totalQty - a.totalQty);
 
         container.innerHTML = sortedGroups.map(g => {
-          // Money visible if manager unlocked, otherwise hidden
           const moneyDisplay = state.isManagerUnlocked
             ? `<span class="font-black text-emerald-700">${g.totalMoney} DH</span>`
             : `<span class="text-slate-400 font-bold">🔒 خاص بالمدير</span>`;
@@ -825,10 +1175,11 @@
         renderKPIs();
         renderAggregatedItems();
         renderSalesList();
+        renderStockSection();
       }
 
       // ==========================================
-      // 4. SALE SUBMISSION & OPERATIONS
+      // 6. SALE SUBMISSION & OPERATIONS
       // ==========================================
       function setupSaleForm() {
         const form = document.getElementById('sale-form');
@@ -867,7 +1218,6 @@
           });
         }
 
-        // Updated Sellers: نورالدين, ايوب, عبد الله
         if (sellerSelect) {
           sellerSelect.value = state.currentSeller;
           sellerSelect.addEventListener('change', (e) => {
@@ -979,7 +1329,7 @@
       }
 
       // ==========================================
-      // 5. MANAGER SPACE (PIN PROTECTED MODAL)
+      // 7. MANAGER SPACE (PIN PROTECTED MODAL)
       // ==========================================
       function setupManagerSpace() {
         const modal = document.getElementById('manager-modal');
@@ -1014,7 +1364,6 @@
           });
         }
 
-        // Lock button to re-hide numbers from employees
         if (lockBtn) {
           lockBtn.addEventListener('click', () => {
             state.isManagerUnlocked = false;
@@ -1029,7 +1378,6 @@
         if (verifyBtn) {
           verifyBtn.addEventListener('click', () => {
             const entered = pinInput.value.trim();
-            // Strictly check hash against state.pinHash only!
             if (verifyEnteredPin(entered)) {
               state.isManagerUnlocked = true;
               pinStep.classList.add('hidden');
@@ -1093,8 +1441,7 @@
           exportCsvBtn.addEventListener('click', exportSalesCSV);
         }
 
-        // Save New PIN:
-        // Sets new pinHash strictly! Old PIN (or 1234) will NEVER work again!
+        // Save New PIN
         const savePinBtn = document.getElementById('btn-save-new-pin');
         if (savePinBtn) {
           savePinBtn.addEventListener('click', () => {
@@ -1103,7 +1450,6 @@
               showToast('يجب أن يتكون رمز PIN من 4 أرقام على الأقل', true);
               return;
             }
-            // Strict Hash Update!
             state.pinHash = hashPin(newPin);
             saveLocalState();
             if (state.syncToCloud) state.syncToCloud();
@@ -1213,7 +1559,9 @@
       function init() {
         loadLocalState();
         setupRealtimeSync();
+        setupPageNavigation();
         setupSaleForm();
+        setupStockSection();
         setupManagerSpace();
         renderAll();
       }
