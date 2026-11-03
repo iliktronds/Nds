@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="h-full bg-slate-100 text-slate-800">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>نظام إدارة المحل، المبيعات والكريدي | إلكترو نور الدين</title>
+  <title>تسجيل مبيعات ومخزون المحل | إلكترو نور الدين</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -64,7 +63,7 @@
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-slate-200 text-center relative overflow-hidden">
       
       <!-- Top Decorative Accent -->
-      <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/30 text-white font-black">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/30 text-white font-black">
         ⚡
       </div>
 
@@ -89,10 +88,10 @@
       <!-- Help hint for shop members -->
       <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-[11px] text-slate-500 space-y-1">
         <p class="font-bold text-slate-700">الأعضاء المصرح لهم:</p>
-        <div class="flex items-center justify-center gap-2 text-[10px] text-slate-600">
-          <span class="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-black">نورالدين (المدير)</span>
-          <span class="bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded font-bold">ايوب</span>
-          <span class="bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded font-bold">عبد الله</span>
+        <div class="flex items-center justify-center gap-1.5 text-[10px] text-slate-600 flex-wrap">
+          <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md font-black">نورالدين (المدير)</span>
+          <span class="bg-blue-100 text-blue-900 px-2 py-0.5 rounded-md font-bold">ايوب</span>
+          <span class="bg-blue-100 text-blue-900 px-2 py-0.5 rounded-md font-bold">عبد الله</span>
         </div>
         <p class="text-[10px] text-slate-400">كل عضو عندو كود PIN خاص بيه كيحميه</p>
       </div>
@@ -100,85 +99,85 @@
     </div>
   </div>
 
-  <!-- ==================== HEADER ==================== -->
+  <!-- ==================== RESPONSIVE SMART HEADER ==================== -->
   <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-slate-800">
-    <div class="max-w-4xl mx-auto px-3 sm:px-4 py-2.5">
+    <div class="max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-2">
+      
+      <!-- Top Row: Logo, User Badge, Manager Button & Lock -->
       <div class="flex items-center justify-between gap-2">
         
-        <!-- Logo & Title -->
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-xl shadow-md font-black">
+        <!-- Brand & Title -->
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-lg shadow font-black">
             📱
           </div>
           <div>
             <h1 class="font-extrabold text-sm sm:text-base leading-tight">إلكترو نور الدين</h1>
-            <p class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5">
+            <p class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
               <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping"></span>
-              <span id="sync-status">سحابة متزامنة ودائمة ☁️</span>
+              <span id="sync-status">سحابة متزامنة ☁️</span>
             </p>
           </div>
         </div>
 
-        <!-- Right: Background Music, User Badge & Manager PIN Button -->
-        <div class="flex items-center gap-2">
+        <!-- User Controls (Always Visible & Never Overflowing!) -->
+        <div class="flex items-center gap-1.5">
           
-          <!-- Music Track Selector & Toggle -->
-          <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-1 gap-1 shadow-sm">
-            <button id="btn-toggle-music" class="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center text-sm transition" title="تشغيل / كتم الموسيقى">
-              <span id="music-icon">🎵</span>
-            </button>
-            <select id="music-track-select" class="bg-slate-900 text-emerald-400 text-xs font-black rounded-lg px-2 py-1 outline-none border border-slate-700 cursor-pointer">
-              <option value="optimism">1. صباح التفاؤل (كاليمبا وأجراس) 🌅</option>
-              <option value="calm">2. هدوء وتركيز (لو-فاي كافيه) ☕</option>
-              <option value="hope">3. أمل وطاقة (عزف جيتار وهارب) 🎸</option>
-              <option value="success">4. عزيمة ونجاح (سينث نشيط ومحفز) 🚀</option>
-              <option value="nature">5. عصافير الطبيعة وبيانو هادئ 🌿</option>
-            </select>
-          </div>
-
-          <!-- User Identity Badge (Locked strictly to the logged-in user!) -->
-          <div id="current-user-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-black shadow-sm">
-            <span id="user-role-icon">👤</span>
-            <span id="user-display-name" class="text-white">--</span>
-          </div>
-
-          <!-- Manager Space Button (Visible only to Manager!) -->
-          <button id="open-manager-btn" class="hidden flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow transition">
+          <!-- Manager Space Button (Visible when logged in as Manager!) -->
+          <button id="open-manager-btn" class="hidden flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow transition active:scale-95">
             <span>👑</span>
-            <span class="hidden sm:inline">لوحة المدير</span>
-            <span class="sm:hidden">المدير</span>
+            <span>المدير</span>
           </button>
 
-          <!-- Logout / Lock Button -->
-          <button id="btn-logout" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700/60 font-bold text-xs shadow transition" title="تسجيل الخروج وقفل الشاشة">
+          <!-- User Identity Badge -->
+          <div id="current-user-badge" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200">
+            <span id="user-role-icon">👤</span>
+            <span id="user-display-name">--</span>
+          </div>
+
+          <!-- Lock / Logout Button -->
+          <button id="btn-logout" class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700/60 text-xs font-bold shadow transition active:scale-95" title="قفل الشاشة">
             <span>🔒</span>
-            <span class="hidden sm:inline">قفل</span>
           </button>
         </div>
 
       </div>
 
-      <!-- Navigation Bar between 3 Main Pages: 1. المبيعات | 2. السلعة لي خاصانا | 3. إدارة الكريدي -->
-      <nav class="flex items-center gap-1.5 pt-2.5 mt-2 border-t border-slate-800 text-xs font-black">
+      <!-- Second Row: Music Player Controls (Dedicated full width on phone!) -->
+      <div class="flex items-center bg-slate-800/90 border border-slate-700/80 rounded-xl p-1 gap-1.5">
+        <button id="btn-toggle-music" class="w-8 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center text-xs transition" title="تشغيل / كتم الموسيقى">
+          <span id="music-icon">🎵</span>
+        </button>
+        <select id="music-track-select" class="flex-1 bg-slate-900 text-emerald-400 text-[11px] font-bold rounded-lg px-2 py-1 outline-none border border-slate-700 cursor-pointer">
+          <option value="optimism">1. صباح التفاؤل (كاليمبا وأجراس) 🌅</option>
+          <option value="calm">2. هدوء وتركيز (لو-فاي كافيه) ☕</option>
+          <option value="hope">3. أمل وطاقة (عزف جيتار وهارب) 🎸</option>
+          <option value="success">4. عزيمة ونجاح (سينث نشيط ومحفز) 🚀</option>
+          <option value="nature">5. عصافير الطبيعة وبيانو هادئ 🌿</option>
+        </select>
+      </div>
+
+      <!-- Third Row: 3 Navigation Tabs (Grid layout: 100% responsive, never overflows!) -->
+      <nav class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800 text-[11px] sm:text-xs font-black">
         
         <!-- Tab 1: Sales -->
-        <button id="nav-btn-sales" class="page-nav-btn active flex-1 py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition whitespace-nowrap">
+        <button id="nav-btn-sales" class="page-nav-btn active py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1 shadow-sm transition">
           <span>🛍️</span>
-          <span>تسجيل المبيعات</span>
+          <span class="truncate">المبيعات</span>
         </button>
 
         <!-- Tab 2: Missing Stock -->
-        <button id="nav-btn-stock" class="page-nav-btn flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1.5 transition whitespace-nowrap">
+        <button id="nav-btn-stock" class="page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition">
           <span>📦</span>
-          <span>السلعة لي خاصا</span>
-          <span id="badge-needed-stock-count" class="bg-amber-500 text-slate-950 text-[10px] px-1.5 py-0.2 rounded-full font-black">0</span>
+          <span class="truncate">السلعة لي خاصا</span>
+          <span id="badge-needed-stock-count" class="bg-amber-500 text-slate-950 text-[10px] px-1 rounded-full font-black">0</span>
         </button>
 
         <!-- Tab 3: Credit & Debts -->
-        <button id="nav-btn-credit" class="page-nav-btn flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1.5 transition whitespace-nowrap">
+        <button id="nav-btn-credit" class="page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition">
           <span>💳</span>
-          <span>إدارة الكريدي</span>
-          <span id="badge-credit-count" class="bg-rose-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">0</span>
+          <span class="truncate">الكريدي</span>
+          <span id="badge-credit-count" class="bg-rose-500 text-white text-[10px] px-1 rounded-full font-black">0</span>
         </button>
 
       </nav>
@@ -504,12 +503,9 @@
         </button>
       </div>
 
-      <!-- ---------------------------------------------------- -->
       <!-- SUB-VIEW A: كريدي الزبائن (كنسال الناس) -->
-      <!-- ---------------------------------------------------- -->
       <div id="subview-credit-customers" class="space-y-4 block">
         
-        <!-- Add Customer Credit Form -->
         <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
           <div class="flex items-center justify-between">
             <h3 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
@@ -522,42 +518,36 @@
           <form id="customer-credit-form" class="space-y-3">
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
               
-              <!-- Customer Name -->
               <div class="sm:col-span-6">
                 <label class="block text-xs font-bold text-slate-700 mb-1">اسم الزبون:</label>
                 <input type="text" id="credit-cust-name" placeholder="مثلا: حميد الفاسي" required
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-rose-500">
               </div>
 
-              <!-- Phone Number -->
               <div class="sm:col-span-6">
                 <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف (للتواصل وتذكير الواتساب):</label>
                 <input type="text" id="credit-cust-phone" placeholder="06XXXXXXXX"
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-mono text-slate-800 outline-none focus:bg-white focus:border-rose-500">
               </div>
 
-              <!-- What they took -->
               <div class="sm:col-span-6">
                 <label class="block text-xs font-bold text-slate-700 mb-1">اشنو خدا (السلعة أو الإصلاح):</label>
                 <input type="text" id="credit-cust-items" placeholder="مثلا: شاشة A12 + شاحن سريع..." required
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-rose-500">
               </div>
 
-              <!-- Total Price -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">الثمن (DH):</label>
                 <input type="number" id="credit-cust-total" placeholder="300" min="0" step="any" required
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-slate-900 outline-none focus:bg-white focus:border-rose-500 text-center">
               </div>
 
-              <!-- Amount Paid -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">الدفع / التسبيق (DH):</label>
                 <input type="number" id="credit-cust-paid" value="0" min="0" step="any" placeholder="100"
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-emerald-600 outline-none focus:bg-white focus:border-rose-500 text-center">
               </div>
 
-              <!-- Remaining (Calculated) -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">الباقي (DH):</label>
                 <input type="text" id="credit-cust-remaining" value="0 DH" readonly
@@ -578,7 +568,6 @@
           <div class="flex items-center justify-between flex-wrap gap-2">
             <h3 class="font-extrabold text-base text-slate-800">لائحة ديون الزبائن:</h3>
             
-            <!-- Filter: Pending vs Settled -->
             <div class="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs font-bold">
               <button id="filter-custcredit-pending" class="custcredit-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs">باقي كيتسال ⏳</button>
               <button id="filter-custcredit-settled" class="custcredit-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900">خالص ومسدود ✅</button>
@@ -594,12 +583,9 @@
 
       </div>
 
-      <!-- ---------------------------------------------------- -->
       <!-- SUB-VIEW B: ديون المحلات والموردين (كيتسالوني الناس) -->
-      <!-- ---------------------------------------------------- -->
       <div id="subview-credit-suppliers" class="space-y-4 hidden">
         
-        <!-- Add Supplier Debt Form -->
         <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-3.5">
           <div class="flex items-center justify-between">
             <h3 class="font-extrabold text-base text-slate-800 flex items-center gap-2">
@@ -612,42 +598,36 @@
           <form id="supplier-debt-form" class="space-y-3">
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
               
-              <!-- Shop / Person Name -->
               <div class="sm:col-span-6">
                 <label class="block text-xs font-bold text-slate-700 mb-1">اسم المحل أو الشخص لي كيتسالنا:</label>
                 <input type="text" id="debt-supp-name" placeholder="مثلا: محل إلكترو كازا / سفيان درب غلف" required
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-amber-500">
               </div>
 
-              <!-- Phone Number -->
               <div class="sm:col-span-6">
                 <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف:</label>
                 <input type="text" id="debt-supp-phone" placeholder="06XXXXXXXX"
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-mono text-slate-800 outline-none focus:bg-white focus:border-amber-500">
               </div>
 
-              <!-- What I took -->
               <div class="sm:col-span-6">
                 <label class="block text-xs font-bold text-slate-700 mb-1">اشنو خديت من عندو (السلعة):</label>
                 <input type="text" id="debt-supp-items" placeholder="مثلا: 2 شاشات A12 + 5 كابلات..." required
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-amber-500">
               </div>
 
-              <!-- Total Price -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">المجموع (DH):</label>
                 <input type="number" id="debt-supp-total" placeholder="500" min="0" step="any" required
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-slate-900 outline-none focus:bg-white focus:border-amber-500 text-center">
               </div>
 
-              <!-- Amount Paid -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">عطيتو تسبيق (DH):</label>
                 <input type="number" id="debt-supp-paid" value="0" min="0" step="any" placeholder="200"
                   class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-emerald-600 outline-none focus:bg-white focus:border-amber-500 text-center">
               </div>
 
-              <!-- Remaining Debt -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">باقي كيتسالني (DH):</label>
                 <input type="text" id="debt-supp-remaining" value="0 DH" readonly
@@ -668,7 +648,6 @@
           <div class="flex items-center justify-between flex-wrap gap-2">
             <h3 class="font-extrabold text-base text-slate-800">لائحة المحلات لي كيتسالونا فلوس:</h3>
             
-            <!-- Filter: Pending vs Settled -->
             <div class="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs font-bold">
               <button id="filter-suppdebt-pending" class="suppdebt-filter-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs">باقي كنتسالو ⏳</button>
               <button id="filter-suppdebt-settled" class="suppdebt-filter-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-900">رديت ليهم خالص ✅</button>
@@ -777,19 +756,23 @@
           </div>
         </div>
 
-        <!-- Dangerous Manager Actions -->
+        <!-- Data Backup & CSV Export Actions -->
         <div class="pt-3 border-t border-slate-200 space-y-2">
-          <h4 class="font-bold text-red-700">إجراءات الحذف ومسح السجل:</h4>
+          <h4 class="font-bold text-slate-700">النسخ الاحتياطي وتصدير البيانات:</h4>
           
-          <div class="flex items-center gap-2">
-            <button id="btn-export-csv" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1">
-              <span>📥</span> تصدير Excel (CSV)
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-export-csv" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
+              <span>📥</span> تصدير المبيعات Excel
             </button>
 
-            <button id="btn-clear-all-sales" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1">
-              <span>🗑️</span> مسح كل المبيعات نهائياً
+            <button id="btn-backup-json" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
+              <span>💾</span> تحميل نسخة احتياطية
             </button>
           </div>
+
+          <button id="btn-clear-all-sales" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1">
+            <span>🗑️</span> مسح المبيعات فقط وتصفير العداد
+          </button>
         </div>
 
       </div>
@@ -1117,10 +1100,10 @@
         const icon = document.getElementById('music-icon');
         if (btn) {
           if (active) {
-            btn.className = 'w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm transition shadow-sm animate-pulse';
+            btn.className = 'w-8 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs transition shadow-sm animate-pulse';
             if (icon) icon.textContent = '🔊';
           } else {
-            btn.className = 'w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 flex items-center justify-center text-sm transition';
+            btn.className = 'w-8 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 flex items-center justify-center text-xs transition';
             if (icon) icon.textContent = '🔇';
           }
         }
@@ -1147,18 +1130,20 @@
     (function() {
       'use strict';
 
-      // Storage Keys
+      // ==========================================
+      // PERMANENT STORAGE KEYS (Never increment version suffixes so data is permanent!)
+      // ==========================================
       const STORAGE_KEYS = {
-        SALES: 'electro_simple_sales_v7',
-        STOCK_NEEDS: 'electro_simple_stock_needs_v7',
-        CREDIT_CUSTOMERS: 'electro_credit_cust_v7',
-        DEBT_SUPPLIERS: 'electro_debt_supp_v7',
-        PRESETS: 'electro_simple_presets_v7',
-        USER_PINS: 'electro_user_pins_v7',
-        ACTIVE_SESSION: 'electro_active_user_v7',
-        LAST_SYNC_TS: 'electro_simple_last_sync_v7',
-        MUSIC_MUTED: 'electro_music_muted_pref_v7',
-        MUSIC_TRACK: 'electro_music_track_pref_v7'
+        SALES: 'electro_permanent_sales_db',
+        STOCK_NEEDS: 'electro_permanent_stock_db',
+        CREDIT_CUSTOMERS: 'electro_permanent_credit_cust_db',
+        DEBT_SUPPLIERS: 'electro_permanent_debt_supp_db',
+        PRESETS: 'electro_permanent_presets_db',
+        USER_PINS: 'electro_permanent_pins_db',
+        ACTIVE_SESSION: 'electro_active_user_session',
+        LAST_SYNC_TS: 'electro_permanent_sync_timestamp',
+        MUSIC_MUTED: 'electro_music_muted_pref',
+        MUSIC_TRACK: 'electro_music_track_pref'
       };
 
       const DEFAULT_PRESETS = [
@@ -1201,45 +1186,98 @@
         userPins: Object.assign({}, DEFAULT_USER_PINS),
         sales: [],
         stockNeeds: [],
-        creditCustomers: [], // Customer credit debts
-        debtSuppliers: [], // Shop debts owed to other shops
+        creditCustomers: [],
+        debtSuppliers: [],
         presets: DEFAULT_PRESETS,
         lastUpdated: 0,
-        roomCode: 'iliktronds_shop_cloud_v7',
+        roomCode: 'iliktronds_shop_permanent_cloud_v1', // Permanent MQTT Room
         totalsFilter: 'all',
         stockFilter: 'pending',
         stockCatFilter: 'all',
         custCreditFilter: 'pending',
         suppDebtFilter: 'pending',
-        activePartialTarget: null, // Holds item being partially paid
+        activePartialTarget: null,
         mqttClient: null
       };
 
-      // 1. Load Data
-      function loadLocalState() {
+      // 1. Automatic Data Recovery & Migration:
+      // Scans localStorage for ANY previously recorded data across v1, v2, v3, v4, v5, v6, v7
+      // so the user NEVER loses any data when code is updated!
+      function migrateAndLoadData() {
         try {
-          const storedSales = localStorage.getItem(STORAGE_KEYS.SALES);
-          if (storedSales) state.sales = JSON.parse(storedSales);
+          // Check permanent key first
+          let loadedSales = localStorage.getItem(STORAGE_KEYS.SALES);
+          let loadedStock = localStorage.getItem(STORAGE_KEYS.STOCK_NEEDS);
+          let loadedCreditCust = localStorage.getItem(STORAGE_KEYS.CREDIT_CUSTOMERS);
+          let loadedDebtSupp = localStorage.getItem(STORAGE_KEYS.DEBT_SUPPLIERS);
+          let loadedPins = localStorage.getItem(STORAGE_KEYS.USER_PINS);
 
-          const storedStock = localStorage.getItem(STORAGE_KEYS.STOCK_NEEDS);
-          if (storedStock) state.stockNeeds = JSON.parse(storedStock);
+          // If permanent keys are empty, search all older version keys (v1..v7) to recover past data!
+          const olderKeys = ['v7', 'v6', 'v5', 'v4', 'v3', 'v2', 'v1'];
+          
+          if (!loadedSales) {
+            for (const v of olderKeys) {
+              const old = localStorage.getItem(`electro_simple_sales_${v}`);
+              if (old && JSON.parse(old).length > 0) {
+                loadedSales = old;
+                break;
+              }
+            }
+          }
 
-          const storedCustCredit = localStorage.getItem(STORAGE_KEYS.CREDIT_CUSTOMERS);
-          if (storedCustCredit) state.creditCustomers = JSON.parse(storedCustCredit);
+          if (!loadedStock) {
+            for (const v of olderKeys) {
+              const old = localStorage.getItem(`electro_simple_stock_needs_${v}`);
+              if (old && JSON.parse(old).length > 0) {
+                loadedStock = old;
+                break;
+              }
+            }
+          }
 
-          const storedSuppDebt = localStorage.getItem(STORAGE_KEYS.DEBT_SUPPLIERS);
-          if (storedSuppDebt) state.debtSuppliers = JSON.parse(storedSuppDebt);
+          if (!loadedCreditCust) {
+            for (const v of olderKeys) {
+              const old = localStorage.getItem(`electro_credit_cust_${v}`);
+              if (old && JSON.parse(old).length > 0) {
+                loadedCreditCust = old;
+                break;
+              }
+            }
+          }
+
+          if (!loadedDebtSupp) {
+            for (const v of olderKeys) {
+              const old = localStorage.getItem(`electro_debt_supp_${v}`);
+              if (old && JSON.parse(old).length > 0) {
+                loadedDebtSupp = old;
+                break;
+              }
+            }
+          }
+
+          if (!loadedPins) {
+            for (const v of olderKeys) {
+              const old = localStorage.getItem(`electro_user_pins_${v}`);
+              if (old) {
+                loadedPins = old;
+                break;
+              }
+            }
+          }
+
+          if (loadedSales) state.sales = JSON.parse(loadedSales);
+          if (loadedStock) state.stockNeeds = JSON.parse(loadedStock);
+          if (loadedCreditCust) state.creditCustomers = JSON.parse(loadedCreditCust);
+          if (loadedDebtSupp) state.debtSuppliers = JSON.parse(loadedDebtSupp);
+
+          if (loadedPins) {
+            try {
+              state.userPins = Object.assign({}, DEFAULT_USER_PINS, JSON.parse(loadedPins));
+            } catch(e) {}
+          }
 
           const storedPresets = localStorage.getItem(STORAGE_KEYS.PRESETS);
           if (storedPresets) state.presets = JSON.parse(storedPresets);
-
-          const storedPins = localStorage.getItem(STORAGE_KEYS.USER_PINS);
-          if (storedPins) {
-            try {
-              const parsed = JSON.parse(storedPins);
-              state.userPins = Object.assign({}, DEFAULT_USER_PINS, parsed);
-            } catch(e) {}
-          }
 
           const storedTrack = localStorage.getItem(STORAGE_KEYS.MUSIC_TRACK);
           if (storedTrack) {
@@ -1253,10 +1291,10 @@
             setUserSession(storedSession, false);
           }
 
-          const storedTs = localStorage.getItem(STORAGE_KEYS.LAST_SYNC_TS);
-          if (storedTs) state.lastUpdated = parseInt(storedTs, 10) || 0;
+          // Immediately save to permanent keys
+          saveLocalState();
         } catch (e) {
-          console.error('LocalStorage load error:', e);
+          console.error('Data migration error:', e);
         }
       }
 
@@ -1351,15 +1389,23 @@
         const stockSellerLabel = document.getElementById('stock-seller-label');
 
         if (state.activeUser) {
-          if (userDisplay) userDisplay.textContent = state.isManager ? 'نورالدين (المدير)' : state.activeUser;
-          if (userRoleIcon) userRoleIcon.textContent = state.isManager ? '👑' : '👤';
+          if (userDisplay) {
+            userDisplay.textContent = state.isManager ? 'نورالدين' : state.activeUser;
+          }
+          if (userRoleIcon) {
+            userRoleIcon.textContent = state.isManager ? '👑' : '👤';
+          }
           if (formSellerName) formSellerName.textContent = state.activeUser;
           if (submitSellerLabel) submitSellerLabel.textContent = state.activeUser;
           if (stockSellerLabel) stockSellerLabel.textContent = state.activeUser;
 
+          // Distinct Manager Button visibility
           if (openManagerBtn) {
-            if (state.isManager) openManagerBtn.classList.remove('hidden');
-            else openManagerBtn.classList.add('hidden');
+            if (state.isManager) {
+              openManagerBtn.classList.remove('hidden');
+            } else {
+              openManagerBtn.classList.add('hidden');
+            }
           }
         } else {
           if (userDisplay) userDisplay.textContent = 'غير مسجل';
@@ -1421,7 +1467,7 @@
       }
 
       // ==========================================
-      // 3. PERMANENT CLOUD RETAIN SYNC (MQTT Retain)
+      // 3. PERMANENT CLOUD RETAIN SYNC (Fixed Topic)
       // ==========================================
       function setupRealtimeSync() {
         const syncDot = document.getElementById('sync-dot');
@@ -1430,7 +1476,7 @@
 
         let localChannel = null;
         try {
-          localChannel = new BroadcastChannel('electro_local_channel_v7');
+          localChannel = new BroadcastChannel('electro_permanent_channel_v1');
           localChannel.onmessage = (e) => {
             if (e.data && e.data.type === 'FULL_SYNC') {
               applyIncomingState(e.data.payload, false);
@@ -1444,20 +1490,17 @@
 
           if (payload.userPins && typeof payload.userPins === 'object') {
             state.userPins = Object.assign({}, DEFAULT_USER_PINS, payload.userPins);
-            try { localStorage.setItem(STORAGE_KEYS.USER_PINS, JSON.stringify(state.userPins)); } catch(e){}
             changed = true;
           }
 
           if (Array.isArray(payload.presets) && payload.presets.length > 0) {
             state.presets = payload.presets;
-            try { localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(state.presets)); } catch(e){}
             changed = true;
           }
 
           if (Array.isArray(payload.sales)) {
             if (JSON.stringify(payload.sales) !== JSON.stringify(state.sales)) {
               state.sales = payload.sales;
-              try { localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(state.sales)); } catch(e){}
               changed = true;
             }
           }
@@ -1465,7 +1508,6 @@
           if (Array.isArray(payload.stockNeeds)) {
             if (JSON.stringify(payload.stockNeeds) !== JSON.stringify(state.stockNeeds)) {
               state.stockNeeds = payload.stockNeeds;
-              try { localStorage.setItem(STORAGE_KEYS.STOCK_NEEDS, JSON.stringify(state.stockNeeds)); } catch(e){}
               changed = true;
             }
           }
@@ -1473,7 +1515,6 @@
           if (Array.isArray(payload.creditCustomers)) {
             if (JSON.stringify(payload.creditCustomers) !== JSON.stringify(state.creditCustomers)) {
               state.creditCustomers = payload.creditCustomers;
-              try { localStorage.setItem(STORAGE_KEYS.CREDIT_CUSTOMERS, JSON.stringify(state.creditCustomers)); } catch(e){}
               changed = true;
             }
           }
@@ -1481,12 +1522,12 @@
           if (Array.isArray(payload.debtSuppliers)) {
             if (JSON.stringify(payload.debtSuppliers) !== JSON.stringify(state.debtSuppliers)) {
               state.debtSuppliers = payload.debtSuppliers;
-              try { localStorage.setItem(STORAGE_KEYS.DEBT_SUPPLIERS, JSON.stringify(state.debtSuppliers)); } catch(e){}
               changed = true;
             }
           }
 
           if (changed) {
+            saveLocalState();
             renderAll();
             if (fromNetwork) {
               showToast('تمت المزامنة من السحابة ☁️');
@@ -1534,7 +1575,7 @@
 
           client.on('connect', () => {
             if (syncDot) syncDot.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-            if (syncStatus) syncStatus.textContent = 'سحابة متصلة ومتزامنة ☁️';
+            if (syncStatus) syncStatus.textContent = 'سحابة متصلة ☁️';
             client.subscribe(topic, { qos: 1 });
           });
 
@@ -1552,7 +1593,7 @@
 
           client.on('offline', () => {
             if (syncDot) syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
-            if (syncStatus) syncStatus.textContent = 'وضع محلي (جاري إعادة الاتصال)';
+            if (syncStatus) syncStatus.textContent = 'وضع محلي';
           });
         } catch (e) {
           console.warn('MQTT setup error:', e);
@@ -1574,23 +1615,21 @@
         function switchMainTab(target) {
           state.currentView = target;
 
-          // Reset all nav buttons
           [btnSales, btnStock, btnCredit].forEach(b => {
-            b.className = 'page-nav-btn flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1.5 transition whitespace-nowrap';
+            b.className = 'page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition';
           });
 
-          // Hide all views
           [viewSales, viewStock, viewCredit].forEach(v => v.classList.add('hidden'));
 
           if (target === 'sales') {
-            btnSales.className = 'page-nav-btn active flex-1 py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition whitespace-nowrap font-black';
+            btnSales.className = 'page-nav-btn active py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black';
             viewSales.classList.remove('hidden');
           } else if (target === 'stock') {
-            btnStock.className = 'page-nav-btn active flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center gap-1.5 shadow-sm transition whitespace-nowrap font-black';
+            btnStock.className = 'page-nav-btn active py-2 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center gap-1 shadow-sm transition font-black';
             viewStock.classList.remove('hidden');
             renderStockSection();
           } else if (target === 'credit') {
-            btnCredit.className = 'page-nav-btn active flex-1 py-2 rounded-xl bg-rose-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition whitespace-nowrap font-black';
+            btnCredit.className = 'page-nav-btn active py-2 rounded-xl bg-rose-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black';
             viewCredit.classList.remove('hidden');
             renderCreditSection();
           }
@@ -1602,7 +1641,7 @@
       }
 
       // ==========================================
-      // 5. INVENTORY & MISSING STOCK (WITH LIVE BRANCH BADGES!)
+      // 5. INVENTORY & MISSING STOCK SECTION
       // ==========================================
       function setupStockSection() {
         const form = document.getElementById('stock-form');
@@ -1711,11 +1750,24 @@
         }
       }
 
+      function fallbackCopy(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+          document.execCommand('copy');
+          showToast('تم نسخ لائحة السلعة بنجاح! دير ليها Coller فالواتساب 📋');
+        } catch(e) {
+          showToast('تعذر النسخ التلقائي', true);
+        }
+        document.body.removeChild(temp);
+      }
+
       function renderStockFilterPills() {
         const bar = document.getElementById('stock-category-filter-bar');
         if (!bar) return;
 
-        // Count pending items per category
         const catCounts = {};
         let totalPending = 0;
         state.stockNeeds.forEach(item => {
@@ -1921,7 +1973,6 @@
         const subviewCust = document.getElementById('subview-credit-customers');
         const subviewSupp = document.getElementById('subview-credit-suppliers');
 
-        // Customer Credit Elements
         const formCust = document.getElementById('customer-credit-form');
         const inputCustName = document.getElementById('credit-cust-name');
         const inputCustPhone = document.getElementById('credit-cust-phone');
@@ -1930,7 +1981,6 @@
         const inputCustPaid = document.getElementById('credit-cust-paid');
         const inputCustRem = document.getElementById('credit-cust-remaining');
 
-        // Supplier Debt Elements
         const formSupp = document.getElementById('supplier-debt-form');
         const inputSuppName = document.getElementById('debt-supp-name');
         const inputSuppPhone = document.getElementById('debt-supp-phone');
@@ -1939,12 +1989,10 @@
         const inputSuppPaid = document.getElementById('debt-supp-paid');
         const inputSuppRem = document.getElementById('debt-supp-remaining');
 
-        // Partial payment modal elements
         const modalPartial = document.getElementById('modal-partial-payment');
         const cancelPartial = document.getElementById('btn-cancel-partial');
         const confirmPartial = document.getElementById('btn-confirm-partial');
 
-        // Auto calculate remaining for customer credit
         function calcCustRemaining() {
           const tot = Math.max(0, parseFloat(inputCustTotal.value || 0));
           const paid = Math.max(0, parseFloat(inputCustPaid.value || 0));
@@ -1953,7 +2001,6 @@
         }
         [inputCustTotal, inputCustPaid].forEach(inp => inp && inp.addEventListener('input', calcCustRemaining));
 
-        // Auto calculate remaining for supplier debt
         function calcSuppRemaining() {
           const tot = Math.max(0, parseFloat(inputSuppTotal.value || 0));
           const paid = Math.max(0, parseFloat(inputSuppPaid.value || 0));
@@ -1962,7 +2009,6 @@
         }
         [inputSuppTotal, inputSuppPaid].forEach(inp => inp && inp.addEventListener('input', calcSuppRemaining));
 
-        // Sub tab switching
         if (btnSubCust && btnSubSupp) {
           btnSubCust.addEventListener('click', () => {
             state.creditSubView = 'customers';
@@ -1981,7 +2027,6 @@
           });
         }
 
-        // Filter buttons
         const fCustPending = document.getElementById('filter-custcredit-pending');
         const fCustSettled = document.getElementById('filter-custcredit-settled');
         if (fCustPending && fCustSettled) {
@@ -2016,7 +2061,6 @@
           });
         }
 
-        // Submit Customer Credit
         if (formCust) {
           formCust.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -2061,7 +2105,6 @@
           });
         }
 
-        // Submit Supplier Debt
         if (formSupp) {
           formSupp.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -2106,7 +2149,6 @@
           });
         }
 
-        // Partial payment modal handlers
         if (cancelPartial) cancelPartial.addEventListener('click', () => modalPartial.classList.add('hidden'));
         if (confirmPartial) {
           confirmPartial.addEventListener('click', () => {
@@ -2119,8 +2161,6 @@
 
             if (state.activePartialTarget) {
               const target = state.activePartialTarget.item;
-              const type = state.activePartialTarget.type; // 'customer' or 'supplier'
-
               target.paid += amount;
               target.remaining = Math.max(0, target.total - target.paid);
               if (target.remaining <= 0) {
@@ -2156,7 +2196,6 @@
       }
 
       function renderCreditSection() {
-        // KPI Counters
         const pendingCust = state.creditCustomers.filter(c => c.status !== 'settled');
         const totalCustMoney = pendingCust.reduce((acc, c) => acc + (c.remaining || 0), 0);
         document.getElementById('kpi-customers-credit').textContent = `${totalCustMoney} DH`;
@@ -2167,14 +2206,10 @@
         document.getElementById('kpi-suppliers-debt').textContent = `${totalSuppMoney} DH`;
         document.getElementById('kpi-suppliers-count').textContent = `${pendingSupp.length} محل أو مورد كيتسالنا`;
 
-        // Update Header Badge for Credit
         const badgeCredit = document.getElementById('badge-credit-count');
         if (badgeCredit) badgeCredit.textContent = (pendingCust.length + pendingSupp.length);
 
-        // Render Customers Credit List
         renderCustomersCreditList();
-
-        // Render Suppliers Debt List
         renderSuppliersDebtList();
       }
 
@@ -2250,7 +2285,6 @@
           `;
         }).join('');
 
-        // Attach listeners
         container.querySelectorAll('.settle-custcredit-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const id = btn.getAttribute('data-id');
@@ -2827,6 +2861,33 @@
         if (exportCsvBtn) {
           exportCsvBtn.addEventListener('click', exportSalesCSV);
         }
+
+        // JSON Backup download button
+        const backupJsonBtn = document.getElementById('btn-backup-json');
+        if (backupJsonBtn) {
+          backupJsonBtn.addEventListener('click', () => {
+            const backupData = {
+              date: new Date().toISOString(),
+              sales: state.sales,
+              stockNeeds: state.stockNeeds,
+              creditCustomers: state.creditCustomers,
+              debtSuppliers: state.debtSuppliers,
+              presets: state.presets,
+              userPins: state.userPins
+            };
+            const jsonStr = JSON.stringify(backupData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Backup_ElectroNoureddine_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('تم تحميل نسخة احتياطية كاملة (Backup) بنجاح 💾');
+          });
+        }
       }
 
       function renderManagerPINDisplay() {
@@ -3043,7 +3104,7 @@
       }
 
       function init() {
-        loadLocalState();
+        migrateAndLoadData(); // Automatically restores any past data from v1..v7!
         setupRealtimeSync();
         setupMusicPlayer();
         setupVoiceStockAI();
