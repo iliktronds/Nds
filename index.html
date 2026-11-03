@@ -708,28 +708,28 @@
 
   <!-- ==================== MODAL: إضافة سلعة أخرى لزبون موجود ==================== -->
   <div id="modal-add-item-to-cust" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-3.5 shadow-2xl text-right">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2">
         <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
           <span>➕</span> <span>زيادة سلعة جديدة لحساب الزبون</span>
         </h4>
-        <button id="btn-close-add-item-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+        <button type="button" id="btn-close-add-item-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
       </div>
 
-      <p id="modal-target-cust-name" class="text-xs font-black text-rose-600 bg-rose-50 p-2 rounded-lg">الزبون: --</p>
+      <p id="modal-target-cust-name" class="text-xs font-black text-rose-600 bg-rose-50 p-2.5 rounded-xl my-3">الزبون: --</p>
 
-      <div class="space-y-2 text-xs">
+      <form id="form-modal-add-item" class="space-y-3 text-xs">
         <div>
           <label class="block text-slate-700 font-bold mb-1">اسم السلعة (مثلا: conector a13):</label>
-          <input type="text" id="modal-new-item-name" placeholder="اكتب السلعة..." required
-            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-bold">
+          <input type="text" id="modal-new-item-name" placeholder="اكتب السلعة..." required autocomplete="off"
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-bold text-slate-900">
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-slate-700 font-bold mb-1">الثمن (DH):</label>
             <input type="number" id="modal-new-item-total" placeholder="50" min="0" step="any" required
-              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black">
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-slate-900">
           </div>
           <div>
             <label class="block text-slate-700 font-bold mb-1">الدفع / التسبيق (DH):</label>
@@ -737,12 +737,14 @@
               class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-emerald-600">
           </div>
         </div>
-      </div>
 
-      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-        <button id="btn-cancel-modal-item" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700">إلغاء</button>
-        <button id="btn-save-modal-item" class="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow">إضافة للكريدي 💾</button>
-      </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancel-modal-item" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition">إلغاء</button>
+          <button type="submit" id="btn-save-modal-item" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+            <span>💾</span> <span>إضافة للكريدي</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1276,6 +1278,8 @@
         custCreditFilter: 'pending',
         suppDebtFilter: 'pending',
         activeTargetCustForNewItem: null, // Holds customer for adding another item
+        activeTargetCustId: null,
+        activeTargetCustName: null,
         activePartialTarget: null, // Holds item being partially paid
         mqttClient: null
       };
@@ -1365,20 +1369,22 @@
           if (loadedSales) state.sales = JSON.parse(loadedSales);
           if (loadedStock) state.stockNeeds = JSON.parse(loadedStock);
 
-          // Customer Credit Migration: Ensure each record has an `items` array
+          // Customer Credit Migration: Ensure each record has an `items` array and safe `id`
           if (loadedCreditCust) {
             const rawCust = JSON.parse(loadedCreditCust);
             state.creditCustomers = rawCust.map(c => {
+              if (!c.id) c.id = 'CRD-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000);
               if (!c.items || !Array.isArray(c.items)) {
+                const legacyName = (typeof c.items === 'string' && c.items.trim()) ? c.items : (c.itemsText || 'سلعة');
                 c.items = [
                   {
-                    id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
-                    name: c.itemsText || c.items || 'سلعة',
+                    id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                    name: legacyName,
                     total: Number(c.total || 0),
                     paid: Number(c.paid || 0),
-                    remaining: Number(c.remaining || 0),
+                    remaining: Math.max(0, Number(c.total || 0) - Number(c.paid || 0)),
                     date: c.date || new Date().toISOString(),
-                    status: c.status || 'pending'
+                    status: (Number(c.total || 0) - Number(c.paid || 0)) <= 0 ? 'settled' : 'pending'
                   }
                 ];
               }
@@ -1623,8 +1629,28 @@
           }
 
           if (Array.isArray(payload.creditCustomers)) {
-            if (JSON.stringify(payload.creditCustomers) !== JSON.stringify(state.creditCustomers)) {
-              state.creditCustomers = payload.creditCustomers;
+            const sanitizedCust = payload.creditCustomers.map(c => {
+              if (!c.id) c.id = 'CRD-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000);
+              if (!Array.isArray(c.items)) {
+                const legacyName = (typeof c.items === 'string' && c.items.trim()) ? c.items : (c.itemsText || 'سلعة');
+                c.items = [
+                  {
+                    id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                    name: legacyName,
+                    total: Number(c.total || 0),
+                    paid: Number(c.paid || 0),
+                    remaining: Math.max(0, Number(c.total || 0) - Number(c.paid || 0)),
+                    date: c.date || new Date().toISOString(),
+                    status: (Number(c.total || 0) - Number(c.paid || 0)) <= 0 ? 'settled' : 'pending'
+                  }
+                ];
+              }
+              updateCustomerRecordTotals(c);
+              return c;
+            });
+
+            if (JSON.stringify(sanitizedCust) !== JSON.stringify(state.creditCustomers)) {
+              state.creditCustomers = sanitizedCust;
               changed = true;
             }
           }
@@ -2106,6 +2132,7 @@
 
         // Add Item to Existing Customer Modal elements
         const modalAddItem = document.getElementById('modal-add-item-to-cust');
+        const formAddItem = document.getElementById('form-modal-add-item');
         const closeAddItemModal = document.getElementById('btn-close-add-item-modal');
         const cancelAddItemModal = document.getElementById('btn-cancel-modal-item');
         const saveAddItemModal = document.getElementById('btn-save-modal-item');
@@ -2377,34 +2404,79 @@
 
         // Add Item Modal handlers
         function hideAddItemModal() {
-          modalAddItem.classList.add('hidden');
+          if (modalAddItem) modalAddItem.classList.add('hidden');
           state.activeTargetCustForNewItem = null;
+          state.activeTargetCustId = null;
+          state.activeTargetCustName = null;
+          const nameInput = document.getElementById('modal-new-item-name');
+          const totalInput = document.getElementById('modal-new-item-total');
+          const paidInput = document.getElementById('modal-new-item-paid');
+          if (nameInput) nameInput.value = '';
+          if (totalInput) totalInput.value = '';
+          if (paidInput) paidInput.value = '0';
         }
+
         if (closeAddItemModal) closeAddItemModal.addEventListener('click', hideAddItemModal);
         if (cancelAddItemModal) cancelAddItemModal.addEventListener('click', hideAddItemModal);
 
-        if (saveAddItemModal) {
-          saveAddItemModal.addEventListener('click', () => {
-            const cust = state.activeTargetCustForNewItem;
-            if (!cust) return;
+        function handleSaveNewItemToCust(e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+
+          try {
+            // Find customer robustly with ID, Name, or Object fallback
+            let cust = null;
+            if (state.activeTargetCustId) {
+              cust = state.creditCustomers.find(c => c.id === state.activeTargetCustId);
+            }
+            if (!cust && state.activeTargetCustName) {
+              cust = state.creditCustomers.find(c => c.name && c.name.trim().toLowerCase() === state.activeTargetCustName.trim().toLowerCase());
+            }
+            if (!cust) {
+              cust = state.activeTargetCustForNewItem;
+            }
+
+            if (!cust) {
+              showToast('حدث خطأ في تحديد حساب الزبون! يرجى إعادة فتح النافذة.', true);
+              return;
+            }
 
             const nameInput = document.getElementById('modal-new-item-name');
             const totalInput = document.getElementById('modal-new-item-total');
             const paidInput = document.getElementById('modal-new-item-paid');
 
-            const name = (nameInput.value || '').trim();
-            const total = Math.max(0, parseFloat(totalInput.value || 0));
-            const paid = Math.max(0, parseFloat(paidInput.value || 0));
+            const name = (nameInput?.value || '').trim();
+            const total = Math.max(0, parseFloat(totalInput?.value || 0));
+            const paid = Math.max(0, parseFloat(paidInput?.value || 0));
             const remaining = Math.max(0, total - paid);
 
             if (!name) {
               showToast('يرجى كتابة اسم السلعة!', true);
-              nameInput.focus();
+              if (nameInput) nameInput.focus();
               return;
             }
 
+            // Ensure items array is healthy
+            if (!Array.isArray(cust.items)) {
+              if (typeof cust.items === 'string' && cust.items.trim()) {
+                cust.items = [{
+                  id: 'ITM-' + Date.now().toString(36) + '-1',
+                  name: cust.items,
+                  total: Number(cust.total || 0),
+                  paid: Number(cust.paid || 0),
+                  remaining: Math.max(0, Number(cust.total || 0) - Number(cust.paid || 0)),
+                  date: cust.date || new Date().toISOString(),
+                  status: (Number(cust.total || 0) - Number(cust.paid || 0)) <= 0 ? 'settled' : 'pending'
+                }];
+              } else {
+                cust.items = [];
+              }
+            }
+
             const newItem = {
-              id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+              id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
               name: name,
               total: total,
               paid: paid,
@@ -2416,6 +2488,12 @@
             cust.items.push(newItem);
             updateCustomerRecordTotals(cust);
 
+            // Re-verify customer is present in state.creditCustomers
+            const exists = state.creditCustomers.some(c => c.id === cust.id || c.name.trim().toLowerCase() === cust.name.trim().toLowerCase());
+            if (!exists) {
+              state.creditCustomers.unshift(cust);
+            }
+
             saveLocalState();
             if (state.syncToCloud) state.syncToCloud();
 
@@ -2423,7 +2501,17 @@
             playCashSound();
             showToast(`تمت إضافة "${name}" لحساب الزبون "${cust.name}" بنجاح! ✅`);
             renderCreditSection();
-          });
+          } catch (err) {
+            console.error('Error saving item to customer:', err);
+            showToast('حدث خطأ أثناء الإضافة: ' + err.message, true);
+          }
+        }
+
+        if (formAddItem) {
+          formAddItem.addEventListener('submit', handleSaveNewItemToCust);
+        }
+        if (saveAddItemModal) {
+          saveAddItemModal.addEventListener('click', handleSaveNewItemToCust);
         }
 
         // Submit Supplier Debt
@@ -2524,7 +2612,11 @@
       }
 
       function openAddItemModal(cust) {
+        if (!cust) return;
         state.activeTargetCustForNewItem = cust;
+        state.activeTargetCustId = cust.id;
+        state.activeTargetCustName = cust.name;
+
         const modal = document.getElementById('modal-add-item-to-cust');
         const custNameEl = document.getElementById('modal-target-cust-name');
         const nameInp = document.getElementById('modal-new-item-name');
@@ -2536,7 +2628,7 @@
         if (totInp) totInp.value = '';
         if (paidInp) paidInp.value = '0';
 
-        modal.classList.remove('hidden');
+        if (modal) modal.classList.remove('hidden');
         if (nameInp) setTimeout(() => nameInp.focus(), 150);
       }
 
@@ -2675,8 +2767,8 @@
               <div class="pt-2 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2">
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <!-- Add another item button -->
-                  <button class="add-item-to-cust-btn px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-xl text-xs font-black border border-rose-200 transition flex items-center gap-1"
-                    data-id="${cust.id}">
+                  <button class="add-item-to-cust-btn px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-xl text-xs font-black border border-rose-200 transition flex items-center gap-1 cursor-pointer active:scale-95"
+                    data-id="${cust.id}" data-name="${encodeURIComponent(cust.name)}">
                     <span>➕</span> <span>زيد سلعة جديدة لهاد الحساب</span>
                   </button>
 
@@ -2711,10 +2803,18 @@
 
         // Attach listeners for Customer Cards
         container.querySelectorAll('.add-item-to-cust-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const custId = btn.getAttribute('data-id');
-            const cust = state.creditCustomers.find(c => c.id === custId);
-            if (cust) openAddItemModal(cust);
+            const custNameRaw = btn.getAttribute('data-name');
+            const custName = custNameRaw ? decodeURIComponent(custNameRaw) : '';
+            const cust = state.creditCustomers.find(c => c.id === custId)
+                      || state.creditCustomers.find(c => c.name && c.name.trim().toLowerCase() === custName.trim().toLowerCase());
+            if (cust) {
+              openAddItemModal(cust);
+            } else {
+              showToast('تعذر العثور على حساب الزبون', true);
+            }
           });
         });
 
