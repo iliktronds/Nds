@@ -769,6 +769,263 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL: إرسال السلعة من المبيعات إلى السلعة لي خاصا ==================== -->
+  <div id="modal-send-sale-to-stock" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
+          <span>📦</span> <span>إرسال السلعة إلى النواقص (السلعة لي خاصا)</span>
+        </h4>
+        <button type="button" id="btn-close-send-stock-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+      </div>
+
+      <p id="send-stock-sale-info" class="text-xs font-bold text-amber-800 bg-amber-50 p-2.5 rounded-xl my-3 border border-amber-200">
+        من عملية البيع: --
+      </p>
+
+      <form id="form-send-sale-to-stock" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة المطلوبة (النواقص):</label>
+          <input type="text" id="send-stock-name" placeholder="مثلا: افشور a12" required autocomplete="off"
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-amber-500 font-bold text-slate-900">
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اختر الفرع / التصنيف المناسب:</label>
+          <select id="send-stock-category" required
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-amber-500 font-bold text-slate-800">
+            <option value="افشور">📱 افشور (شاشات وافشورات)</option>
+            <option value="5D">🛡️ 5D (زجاج 5D / 9D Incassable)</option>
+            <option value="زاج عادي">🔲 زاج عادي (حماية عادي)</option>
+            <option value="بوشيط">💼 بوشيط (أغطية وبوشيطات)</option>
+            <option value="باتري">🔋 باتري (بطاريات)</option>
+            <option value="شارجورات">🔌 شارجورات (شواحن وكابلات)</option>
+            <option value="اكسسوارات">🎧 اكسسوارات (سماعات وإكسسوار)</option>
+            <option value="هواتف">📲 هواتف (هواتف ذكية)</option>
+            <option value="اصلاح الهاتف">🔧 اصلاح الهاتف (قطع غيار وكونيكتور)</option>
+          </select>
+          
+          <!-- Category Quick Selection Pills -->
+          <div class="flex items-center gap-1.5 flex-wrap mt-2" id="send-stock-pills-container">
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="افشور">📱 افشور</button>
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="5D">🛡️ 5D</button>
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="زاج عادي">🔲 زاج</button>
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="بوشيط">💼 بوشيط</button>
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="باتري">🔋 باتري</button>
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="شارجورات">🔌 شارجورات</button>
+            <button type="button" class="stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer" data-cat="اصلاح الهاتف">🔧 اصلاح</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الكمية المطلوبة:</label>
+            <input type="number" id="send-stock-qty" min="1" value="1" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-slate-900">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">درجة الأولوية:</label>
+            <select id="send-stock-priority"
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white font-bold text-slate-800 text-center">
+              <option value="عادي">عادي ⚪</option>
+              <option value="طلب زبون">طلب زبون 🟡</option>
+              <option value="مستعجل بزاف">مستعجل 🔴</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancel-send-stock" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition">إلغاء</button>
+          <button type="submit" id="btn-confirm-send-stock" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+            <span>📦</span> <span>تأكيد الإرسال للنواقص</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: تعديل عملية البيع (خاص بالمدير) ==================== -->
+  <div id="modal-edit-sale" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
+          <span>✏️</span> <span>تعديل عملية البيع (صلاحية المدير 👑)</span>
+        </h4>
+        <button type="button" id="btn-close-edit-sale-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+      </div>
+
+      <p class="text-xs text-blue-700 bg-blue-50 p-2 rounded-xl my-3 font-bold border border-blue-200">
+        تعديل تقياد الموظف وتصحيح الثمن أو السلعة أو الكمية
+      </p>
+
+      <form id="form-edit-sale" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-sale-id">
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة المباعة:</label>
+          <input type="text" id="edit-sale-name" placeholder="اسم السلعة..." required autocomplete="off"
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-blue-500 font-bold text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">ثمن القطعة (DH):</label>
+            <input type="number" id="edit-sale-unit-price" min="0" step="any" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-emerald-600">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الكمية المباعة:</label>
+            <input type="number" id="edit-sale-qty" min="1" step="1" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-blue-600">
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500 font-bold">المجموع الكلي للبيع:</span>
+          <span id="edit-sale-calc-total" class="font-black text-sm text-emerald-700">0 DH</span>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">الموظف / البائع المسجل باسمه:</label>
+          <select id="edit-sale-seller" required
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white font-bold text-slate-800">
+            <option value="نورالدين">نورالدين (المدير 👑)</option>
+            <option value="ايوب">ايوب 👤</option>
+            <option value="عبد الله">عبد الله 👤</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancel-edit-sale" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition">إلغاء</button>
+          <button type="submit" id="btn-save-edit-sale" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+            <span>💾</span> <span>حفظ التعديلات</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: تعديل السلعة لي خاصا (خاص بالمدير) ==================== -->
+  <div id="modal-edit-stock" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
+          <span>✏️</span> <span>تعديل السلعة لي خاصا (المدير 👑)</span>
+        </h4>
+        <button type="button" id="btn-close-edit-stock-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+      </div>
+
+      <form id="form-edit-stock" class="space-y-3 text-xs mt-3">
+        <input type="hidden" id="edit-stock-id">
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة:</label>
+          <input type="text" id="edit-stock-name" required autocomplete="off"
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-amber-500 font-bold text-slate-900">
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">الفرع / التصنيف:</label>
+          <select id="edit-stock-cat" required
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white font-bold text-slate-800">
+            <option value="افشور">📱 افشور (شاشات وافشورات)</option>
+            <option value="5D">🛡️ 5D (زجاج 5D / 9D Incassable)</option>
+            <option value="زاج عادي">🔲 زاج عادي (حماية عادي)</option>
+            <option value="بوشيط">💼 بوشيط (أغطية وبوشيطات)</option>
+            <option value="باتري">🔋 باتري (بطاريات)</option>
+            <option value="شارجورات">🔌 شارجورات (شواحن وكابلات)</option>
+            <option value="اكسسوارات">🎧 اكسسوارات (سماعات وإكسسوار)</option>
+            <option value="هواتف">📲 هواتف (هواتف ذكية)</option>
+            <option value="اصلاح الهاتف">🔧 اصلاح الهاتف (قطع غيار وكونيكتور)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الكمية:</label>
+            <input type="number" id="edit-stock-qty" min="1" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الأولوية:</label>
+            <select id="edit-stock-priority"
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white font-bold text-center">
+              <option value="عادي">عادي ⚪</option>
+              <option value="طلب زبون">طلب زبون 🟡</option>
+              <option value="مستعجل بزاف">مستعجل 🔴</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">الموظف الذي قيدها:</label>
+          <select id="edit-stock-addedby" required
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white font-bold text-slate-800">
+            <option value="نورالدين">نورالدين (المدير 👑)</option>
+            <option value="ايوب">ايوب 👤</option>
+            <option value="عبد الله">عبد الله 👤</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancel-edit-stock" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition">إلغاء</button>
+          <button type="submit" id="btn-save-edit-stock" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+            <span>💾</span> <span>حفظ التعديلات</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: تعديل سلعة الكريدي (خاص بالمدير) ==================== -->
+  <div id="modal-edit-credit-item" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
+          <span>✏️</span> <span>تعديل سلعة الكريدي (المدير 👑)</span>
+        </h4>
+        <button type="button" id="btn-close-edit-credit-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+      </div>
+
+      <p id="edit-credit-item-cust-name" class="text-xs text-rose-600 bg-rose-50 p-2 rounded-xl my-3 font-bold border border-rose-200">الزبون: --</p>
+
+      <form id="form-edit-credit-item" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-credit-cust-id">
+        <input type="hidden" id="edit-credit-item-id">
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة:</label>
+          <input type="text" id="edit-credit-item-name" required autocomplete="off"
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-bold text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الثمن الإجمالي (DH):</label>
+            <input type="number" id="edit-credit-item-total" min="0" step="any" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">المدفوع / التسبيق (DH):</label>
+            <input type="number" id="edit-credit-item-paid" min="0" step="any" value="0" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-emerald-600">
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500 font-bold">الباقي المحسوب:</span>
+          <span id="edit-credit-item-calc-rem" class="font-black text-sm text-rose-600">0 DH</span>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancel-edit-credit" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition">إلغاء</button>
+          <button type="submit" id="btn-save-edit-credit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+            <span>💾</span> <span>حفظ التعديلات</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
   <!-- ==================== MODAL: لوحة المدير (خاصة بنورالدين فقط) ==================== -->
   <div id="manager-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl border border-slate-200 text-right">
@@ -858,23 +1115,48 @@
           </div>
         </div>
 
-        <!-- Data Backup & CSV Export Actions -->
-        <div class="pt-3 border-t border-slate-200 space-y-2">
-          <h4 class="font-bold text-slate-700">النسخ الاحتياطي وتصدير البيانات:</h4>
-          
-          <div class="grid grid-cols-2 gap-2">
-            <button id="btn-export-csv" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
-              <span>📥</span> تصدير المبيعات Excel
-            </button>
-
-            <button id="btn-backup-json" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
-              <span>💾</span> تحميل نسخة احتياطية
-            </button>
+        <!-- Data Backup & Restore & CSV Export Actions -->
+        <div class="pt-3 border-t border-slate-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-slate-800 text-sm flex items-center gap-1.5">
+              <span>💾</span> <span>النسخ الاحتياطي الشامل واسترجاع البيانات:</span>
+            </h4>
+            <span class="text-[10px] bg-blue-100 text-blue-900 font-black px-2 py-0.5 rounded-full">نسخة كاملة</span>
           </div>
 
-          <button id="btn-clear-all-sales" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1">
-            <span>🗑️</span> مسح المبيعات فقط وتصفير العداد
-          </button>
+          <!-- Educational instructions box on how to backup & restore on phone/PC -->
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1.5 text-xs text-blue-950 font-bold">
+            <p class="font-black text-blue-900 flex items-center gap-1">
+              <span>💡</span> <span>دليل الهاتف: كيفاش تهز الباكاب وكيفاش ترجعو:</span>
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-[11px] text-blue-900 font-semibold leading-relaxed">
+              <li><strong>هزان الباكاب:</strong> اضغط على <strong>«تحميل نسخة احتياطية كاملة 💾»</strong>، غايتيليشارجا ملف JSON فالهاتف فيه كولشي: المبيعات، السلعة لي خاصا، الكريدي، ديون المحلات، وأكواد PIN.</li>
+              <li><strong>ترجاع الباكاب:</strong> إيلا تبدل التليفون أو تمسحات لمعلومات، اضغط على <strong>«استرجاع نسخة احتياطية 📥»</strong> وعزل نفس الملف؛ فالحين كيرجع كولشي وكيتسنكرونيزا مع باقي الهواتف!</li>
+            </ul>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Download Full Backup JSON -->
+            <button type="button" id="btn-backup-json" class="py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer">
+              <span>💾</span> <span>تحميل نسخة احتياطية كاملة</span>
+            </button>
+
+            <!-- Restore Backup JSON -->
+            <button type="button" id="btn-trigger-restore" class="py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer">
+              <span>📥</span> <span>استرجاع نسخة احتياطية</span>
+            </button>
+            <input type="file" id="input-restore-file" accept=".json,application/json" class="hidden">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button type="button" id="btn-export-csv" class="py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-xs cursor-pointer">
+              <span>📊</span> تصدير Excel (CSV)
+            </button>
+
+            <button type="button" id="btn-clear-all-sales" class="py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-xs cursor-pointer">
+              <span>🗑️</span> تصفير المبيعات فقط
+            </button>
+          </div>
         </div>
 
       </div>
@@ -1281,6 +1563,11 @@
         activeTargetCustId: null,
         activeTargetCustName: null,
         activePartialTarget: null, // Holds item being partially paid
+        activeSendToStockSale: null, // Holds sale being sent to missing stock
+        activeEditingSale: null, // Holds sale currently being edited by manager
+        activeEditingStock: null, // Holds missing stock item being edited by manager
+        activeEditingCreditCust: null,
+        activeEditingCreditItem: null,
         mqttClient: null
       };
 
@@ -2006,8 +2293,15 @@
 
             const dateStr = new Date(item.date).toLocaleDateString('ar-MA', { day: 'numeric', month: 'short' });
 
+            const editStockBtnHtml = state.isManager ? `
+              <button class="edit-stock-btn w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs transition border border-blue-200 cursor-pointer active:scale-95"
+                data-id="${item.id}" title="تعديل السلعة لي خاصا (المدير 👑)">
+                ✏️
+              </button>
+            ` : '';
+
             const deleteBtnHtml = state.isManager ? `
-              <button class="delete-stock-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-xs transition"
+              <button class="delete-stock-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-xs transition cursor-pointer active:scale-95"
                 data-id="${item.id}" title="حذف (المدير فقط)">
                 ✕
               </button>
@@ -2025,18 +2319,23 @@
                 </div>
 
                 <div class="flex items-center gap-1.5">
-                  ${!isBought ? `
-                    <button class="mark-bought-btn px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-black rounded-lg text-xs transition flex items-center gap-1"
+                  ${!isBought ? (state.isManager ? `
+                    <button class="mark-bought-btn px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-black rounded-lg text-xs transition flex items-center gap-1 cursor-pointer active:scale-95"
                       data-id="${item.id}" title="تم الشراء وإدخالها للمحل">
                       <span>✅</span> <span>تشراَت</span>
                     </button>
                   ` : `
-                    <button class="unmark-bought-btn px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-[10px]"
+                    <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">🔒 الشراء للمدير فقط</span>
+                  `) : (state.isManager ? `
+                    <button class="unmark-bought-btn px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-[10px] cursor-pointer active:scale-95"
                       data-id="${item.id}" title="إرجاع إلى قائمة السلع المطلوبة">
                       <span>↩️</span> إرجاع
                     </button>
-                  `}
+                  ` : `
+                    <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">تشراَت ✓</span>
+                  `)}
 
+                  ${editStockBtnHtml}
                   ${deleteBtnHtml}
                 </div>
               </div>
@@ -2063,6 +2362,10 @@
 
         container.querySelectorAll('.mark-bought-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('التأشير على شراء السلع متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const id = btn.getAttribute('data-id');
             const item = state.stockNeeds.find(i => i.id === id);
             if (item) {
@@ -2077,6 +2380,10 @@
 
         container.querySelectorAll('.unmark-bought-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('إرجاع السلع المطلوبة متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const id = btn.getAttribute('data-id');
             const item = state.stockNeeds.find(i => i.id === id);
             if (item) {
@@ -2085,6 +2392,15 @@
               if (state.syncToCloud) state.syncToCloud();
               renderStockSection();
             }
+          });
+        });
+
+        container.querySelectorAll('.edit-stock-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            const item = state.stockNeeds.find(i => i.id === id);
+            if (item) openEditStockModal(item);
           });
         });
 
@@ -2707,18 +3023,22 @@
                 </div>
 
                 <div class="flex items-center gap-1">
-                  ${!isItemSettled ? `
-                    <button class="pay-item-btn px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-[11px] font-bold"
+                  ${!isItemSettled ? (state.isManager ? `
+                    <button class="pay-item-btn px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-[11px] font-bold cursor-pointer active:scale-95 transition"
                       data-cust-id="${cust.id}" data-item-id="${it.id}">
                       💵 دفع جزء
                     </button>
-                    <button class="settle-item-btn px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-black"
+                    <button class="settle-item-btn px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-black cursor-pointer active:scale-95 transition"
                       data-cust-id="${cust.id}" data-item-id="${it.id}">
                       ✅ تسدّات
                     </button>
-                  ` : ''}
+                  ` : `
+                    <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">🔒 الخلاص للمدير فقط</span>
+                  `) : ''}
 
                   ${state.isManager ? `
+                    <button class="edit-credit-item-btn px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-xs rounded border border-blue-200 cursor-pointer transition active:scale-95"
+                      data-cust-id="${cust.id}" data-item-id="${it.id}" title="تعديل هذه السلعة (المدير 👑)">✏️</button>
                     <button class="delete-item-btn text-red-500 hover:text-red-700 font-black text-xs px-1"
                       data-cust-id="${cust.id}" data-item-id="${it.id}" title="حذف هذه السلعة">✕</button>
                   ` : ''}
@@ -2781,12 +3101,14 @@
                 </div>
 
                 <div class="flex items-center gap-1.5">
-                  ${!isAllSettled ? `
-                    <button class="settle-all-cust-btn px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs transition"
+                  ${!isAllSettled ? (state.isManager ? `
+                    <button class="settle-all-cust-btn px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs transition cursor-pointer active:scale-95"
                       data-id="${cust.id}">
                       ✅ تسديد كامل الحساب
                     </button>
-                  ` : ''}
+                  ` : `
+                    <span class="text-xs text-slate-400 font-bold bg-slate-100 px-2.5 py-1 rounded-xl">🔒 تسديد الحساب للمدير فقط</span>
+                  `) : ''}
 
                   ${state.isManager ? `
                     <button class="delete-cust-btn w-8 h-8 rounded-xl bg-slate-200 hover:bg-red-100 text-slate-500 hover:text-red-600 flex items-center justify-center font-bold text-xs transition"
@@ -2821,6 +3143,10 @@
         // Settle single item
         container.querySelectorAll('.settle-item-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('التأشير بخلاص الكريدي متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const custId = btn.getAttribute('data-cust-id');
             const itemId = btn.getAttribute('data-item-id');
             const cust = state.creditCustomers.find(c => c.id === custId);
@@ -2844,6 +3170,10 @@
         // Pay partial for single item
         container.querySelectorAll('.pay-item-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('تسجيل دفعات الكريدي متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const custId = btn.getAttribute('data-cust-id');
             const itemId = btn.getAttribute('data-item-id');
             const cust = state.creditCustomers.find(c => c.id === custId);
@@ -2858,6 +3188,20 @@
                   maxAmount: item.remaining
                 });
               }
+            }
+          });
+        });
+
+        // Edit single item from customer account (Manager only)
+        container.querySelectorAll('.edit-credit-item-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const custId = btn.getAttribute('data-cust-id');
+            const itemId = btn.getAttribute('data-item-id');
+            const cust = state.creditCustomers.find(c => c.id === custId);
+            if (cust) {
+              const item = cust.items.find(it => it.id === itemId);
+              if (item) openEditCreditItemModal(cust, item);
             }
           });
         });
@@ -2887,6 +3231,10 @@
         // Settle all items for customer
         container.querySelectorAll('.settle-all-cust-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('تسديد كامل الحساب متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const custId = btn.getAttribute('data-id');
             const cust = state.creditCustomers.find(c => c.id === custId);
             if (cust) {
@@ -2988,16 +3336,18 @@
               </div>
 
               <div class="flex items-center gap-1.5 flex-wrap">
-                ${!isSettled ? `
-                  <button class="partial-suppdebt-btn px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg text-xs font-bold transition"
+                ${!isSettled ? (state.isManager ? `
+                  <button class="partial-suppdebt-btn px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg text-xs font-bold transition cursor-pointer active:scale-95"
                     data-id="${item.id}">
                     💵 دفعت جزء
                   </button>
-                  <button class="settle-suppdebt-btn px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shadow-xs transition"
+                  <button class="settle-suppdebt-btn px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shadow-xs transition cursor-pointer active:scale-95"
                     data-id="${item.id}">
                     ✅ رديت كولشي
                   </button>
                 ` : `
+                  <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded">🔒 الدفع للمدير فقط</span>
+                `) : `
                   <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black">خالص ومردود ✓</span>
                 `}
 
@@ -3009,6 +3359,10 @@
 
         container.querySelectorAll('.settle-suppdebt-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('أداء ديون المحلات متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const id = btn.getAttribute('data-id');
             const item = state.debtSuppliers.find(d => d.id === id);
             if (item) {
@@ -3026,6 +3380,10 @@
 
         container.querySelectorAll('.partial-suppdebt-btn').forEach(btn => {
           btn.addEventListener('click', () => {
+            if (!state.isManager) {
+              showToast('دفع ديون المحلات متاح للمدير (نورالدين) فقط!', true);
+              return;
+            }
             const id = btn.getAttribute('data-id');
             const item = state.debtSuppliers.find(d => d.id === id);
             if (item) {
@@ -3188,6 +3546,137 @@
         }).join('');
       }
 
+
+      // Helper function to intelligently detect category based on item name keywords
+      function detectStockCategory(text) {
+        if (!text) return "افشور";
+        const t = text.toLowerCase();
+        if (t.includes("افشور") || t.includes("afficheur") || t.includes("lcd") || t.includes("ecran") || t.includes("شاشة") || t.includes("شاشه")) return "افشور";
+        if (t.includes("5d") || t.includes("9d") || t.includes("11d") || t.includes("incassable") || t.includes("انكاسابل") || t.includes("سيراميك") || t.includes("انكاسبل")) return "5D";
+        if (t.includes("زاج") || t.includes("زجاج") || t.includes("verre") || t.includes("عادي")) return "زاج عادي";
+        if (t.includes("بوشيط") || t.includes("بوشيت") || t.includes("pochette") || t.includes("غشاء") || t.includes("كفر") || t.includes("cover")) return "بوشيط";
+        if (t.includes("باتري") || t.includes("بطارية") || t.includes("بطاريه") || t.includes("battery") || t.includes("batterie") || t.includes("pile")) return "باتري";
+        if (t.includes("شارجور") || t.includes("شاحن") || t.includes("كابل") || t.includes("chargeur") || t.includes("cable") || t.includes("خيط") || t.includes("type c") || t.includes("type-c") || t.includes("lightning") || t.includes("20w")) return "شارجورات";
+        if (t.includes("سماعات") || t.includes("اوكوتور") || t.includes("ecouteur") || t.includes("airpods") || t.includes("casque") || t.includes("ساعة") || t.includes("montre") || t.includes("اكسسوار") || t.includes("accessoire") || t.includes("ring")) return "اكسسوارات";
+        if (t.includes("هاتف") || t.includes("تليفون") || t.includes("بورطابل") || t.includes("telephone") || t.includes("iphone") || t.includes("samsung") || t.includes("redmi") || t.includes("infinix") || t.includes("xiaomi") || t.includes("oppo") || t.includes("vivo") || t.includes("realme")) return "هواتف";
+        if (t.includes("اصلاح") || t.includes("كونيكتور") || t.includes("conector") || t.includes("connecteur") || t.includes("nappe") || t.includes("فلاتة") || t.includes("كاميرا") || t.includes("camera") || t.includes("سبيكر") || t.includes("speaker") || t.includes("ميكرو") || t.includes("micro") || t.includes("بياس") || t.includes("قطعة")) return "اصلاح الهاتف";
+        return "افشور";
+      }
+
+      function highlightStockPill(cat) {
+        document.querySelectorAll("#send-stock-pills-container .stock-pill-btn").forEach(b => {
+          if (b.getAttribute("data-cat") === cat) {
+            b.className = "stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-black bg-amber-500 text-slate-950 border-amber-600 shadow-xs cursor-pointer";
+          } else {
+            b.className = "stock-pill-btn px-2 py-1 rounded-lg border text-[11px] font-bold bg-white text-slate-700 hover:bg-amber-50 cursor-pointer";
+          }
+        });
+      }
+
+      function openSendSaleToStockModal(sale) {
+        if (!sale) return;
+        state.activeSendToStockSale = sale;
+        const modal = document.getElementById("modal-send-sale-to-stock");
+        const infoEl = document.getElementById("send-stock-sale-info");
+        const nameInp = document.getElementById("send-stock-name");
+        const catSelect = document.getElementById("send-stock-category");
+        const qtyInp = document.getElementById("send-stock-qty");
+        const prioritySelect = document.getElementById("send-stock-priority");
+
+        if (infoEl) infoEl.textContent = `من عملية بيع: ${sale.name} (${sale.qty} قطع) سجلها: ${sale.seller}`;
+        if (nameInp) nameInp.value = sale.name || "";
+        
+        const detectedCat = detectStockCategory(sale.name);
+        if (catSelect) catSelect.value = detectedCat;
+        if (qtyInp) qtyInp.value = sale.qty || 1;
+        if (prioritySelect) prioritySelect.value = "عادي";
+
+        highlightStockPill(detectedCat);
+
+        if (modal) modal.classList.remove("hidden");
+        if (nameInp) setTimeout(() => nameInp.focus(), 150);
+      }
+
+      function openEditSaleModal(sale) {
+        if (!state.isManager || !sale) {
+          showToast("تعديل المبيعات متاح للمدير (نورالدين) فقط!", true);
+          return;
+        }
+        state.activeEditingSale = sale;
+        const modal = document.getElementById("modal-edit-sale");
+        const idInp = document.getElementById("edit-sale-id");
+        const nameInp = document.getElementById("edit-sale-name");
+        const priceInp = document.getElementById("edit-sale-unit-price");
+        const qtyInp = document.getElementById("edit-sale-qty");
+        const sellerSelect = document.getElementById("edit-sale-seller");
+        const totalSpan = document.getElementById("edit-sale-calc-total");
+
+        if (idInp) idInp.value = sale.id;
+        if (nameInp) nameInp.value = sale.name;
+        if (priceInp) priceInp.value = sale.unitPrice;
+        if (qtyInp) qtyInp.value = sale.qty;
+        if (sellerSelect) sellerSelect.value = sale.seller || "نورالدين";
+
+        const calcTot = (parseFloat(sale.unitPrice || 0) * parseInt(sale.qty || 1, 10));
+        if (totalSpan) totalSpan.textContent = `${calcTot.toFixed(0)} DH`;
+
+        if (modal) modal.classList.remove("hidden");
+        if (nameInp) setTimeout(() => nameInp.focus(), 150);
+      }
+
+      function openEditStockModal(item) {
+        if (!state.isManager || !item) {
+          showToast("تعديل السلع متاح للمدير (نورالدين) فقط!", true);
+          return;
+        }
+        state.activeEditingStock = item;
+        const modal = document.getElementById("modal-edit-stock");
+        const idInp = document.getElementById("edit-stock-id");
+        const nameInp = document.getElementById("edit-stock-name");
+        const catSelect = document.getElementById("edit-stock-cat");
+        const qtyInp = document.getElementById("edit-stock-qty");
+        const prioritySelect = document.getElementById("edit-stock-priority");
+        const addedBySelect = document.getElementById("edit-stock-addedby");
+
+        if (idInp) idInp.value = item.id;
+        if (nameInp) nameInp.value = item.name;
+        if (catSelect) catSelect.value = item.category || "افشور";
+        if (qtyInp) qtyInp.value = item.qty || 1;
+        if (prioritySelect) prioritySelect.value = item.priority || "عادي";
+        if (addedBySelect) addedBySelect.value = item.addedBy || "نورالدين";
+
+        if (modal) modal.classList.remove("hidden");
+        if (nameInp) setTimeout(() => nameInp.focus(), 150);
+      }
+
+      function openEditCreditItemModal(cust, item) {
+        if (!state.isManager || !cust || !item) {
+          showToast("تعديل الكريدي متاح للمدير (نورالدين) فقط!", true);
+          return;
+        }
+        state.activeEditingCreditCust = cust;
+        state.activeEditingCreditItem = item;
+        const modal = document.getElementById("modal-edit-credit-item");
+        const custNameEl = document.getElementById("edit-credit-item-cust-name");
+        const custIdInp = document.getElementById("edit-credit-cust-id");
+        const itemIdInp = document.getElementById("edit-credit-item-id");
+        const nameInp = document.getElementById("edit-credit-item-name");
+        const totalInp = document.getElementById("edit-credit-item-total");
+        const paidInp = document.getElementById("edit-credit-item-paid");
+        const remSpan = document.getElementById("edit-credit-item-calc-rem");
+
+        if (custIdInp) custIdInp.value = cust.id;
+        if (itemIdInp) itemIdInp.value = item.id;
+        if (custNameEl) custNameEl.textContent = `الزبون: ${cust.name}`;
+        if (nameInp) nameInp.value = item.name;
+        if (totalInp) totalInp.value = item.total;
+        if (paidInp) paidInp.value = item.paid;
+        if (remSpan) remSpan.textContent = `${item.remaining} DH`;
+
+        if (modal) modal.classList.remove("hidden");
+        if (nameInp) setTimeout(() => nameInp.focus(), 150);
+      }
+
       function renderSalesList() {
         const container = document.getElementById('sales-list-container');
         const badgeCount = document.getElementById('sales-badge-count');
@@ -3213,33 +3702,65 @@
                ${s.qty > 1 ? `<span class="text-[10px] text-slate-400">(${s.unitPrice} DH/قطعة)</span>` : ''}`
             : `<span class="text-xs text-slate-400 font-bold block">🔒 مخفي</span>`;
 
+          const editBtnHtml = state.isManager ? `
+            <button class="edit-sale-btn w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm transition active:scale-95 cursor-pointer border border-blue-200"
+              data-id="${s.id}" title="تعديل تفاصيل البيع (صلاحيات المدير 👑)">
+              ✏️
+            </button>
+          ` : '';
+
           const deleteBtnHtml = state.isManager ? `
-            <button class="delete-sale-btn w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-sm transition"
+            <button class="delete-sale-btn w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-sm transition active:scale-95 cursor-pointer"
               data-id="${s.id}" title="مسح هذه العملية (صلاحية المدير فقط)">
               🗑️
             </button>
           ` : '';
 
           return `
-            <div class="py-2.5 flex items-center justify-between gap-2 text-xs">
+            <div class="py-2.5 flex items-center justify-between gap-2 text-xs border-b border-slate-100 last:border-0 flex-wrap sm:flex-nowrap">
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <h4 class="font-extrabold text-slate-800 text-sm truncate">${s.name}</h4>
                   <span class="bg-blue-100 text-blue-800 font-black text-[10px] px-1.5 py-0.5 rounded">${s.qty > 1 ? s.qty + 'x' : '1'}</span>
                 </div>
-                <p class="text-[10px] text-slate-400">باعها: <strong class="text-slate-600 font-bold">${s.seller}</strong> | ${dateStr} - ${timeStr}</p>
+                <p class="text-[10px] text-slate-400 mt-0.5">باعها: <strong class="text-slate-600 font-bold">${s.seller}</strong> | ${dateStr} - ${timeStr}</p>
               </div>
 
-              <div class="flex items-center gap-3">
-                <div class="text-left">
+              <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-end">
+                <!-- Send to Missing Stock Button -->
+                <button class="send-to-stock-btn px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-xl text-[11px] font-black transition flex items-center gap-1 active:scale-95 cursor-pointer shadow-2xs"
+                  data-id="${s.id}" title="إرسال هذه السلعة مباشرة للسلع لي خاصانا (النواقص)">
+                  <span>📦</span> <span>السلعة لي خاصا</span>
+                </button>
+
+                <div class="text-left min-w-[65px]">
                   ${priceDisplay}
                 </div>
 
+                ${editBtnHtml}
                 ${deleteBtnHtml}
               </div>
             </div>
           `;
         }).join('');
+
+        container.querySelectorAll('.send-to-stock-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const saleId = btn.getAttribute('data-id');
+            const sale = state.sales.find(s => s.id === saleId);
+            if (sale) openSendSaleToStockModal(sale);
+          });
+        });
+
+        container.querySelectorAll('.edit-sale-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const saleId = btn.getAttribute('data-id');
+            const sale = state.sales.find(s => s.id === saleId);
+            if (sale) openEditSaleModal(sale);
+          });
+        });
 
         container.querySelectorAll('.delete-sale-btn').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -3480,7 +4001,11 @@
         if (backupJsonBtn) {
           backupJsonBtn.addEventListener('click', () => {
             const backupData = {
+              app: 'Electro Noureddine Shop POS',
+              version: '2.5',
+              timestamp: Date.now(),
               date: new Date().toISOString(),
+              exportedBy: state.activeUser || 'نورالدين',
               sales: state.sales,
               stockNeeds: state.stockNeeds,
               creditCustomers: state.creditCustomers,
@@ -3493,12 +4018,106 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Backup_ElectroNoureddine_${new Date().toISOString().slice(0, 10)}.json`;
+            const nowStr = new Date().toISOString().slice(0, 10);
+            a.download = `Backup_ElectroNoureddine_Kamel_${nowStr}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast('تم تحميل نسخة احتياطية كاملة (Backup) بنجاح 💾');
+            playCashSound();
+            showToast('تم تحميل النسخة الاحتياطية الكاملة بنجاح فالهاتف 💾');
+          });
+        }
+
+        const triggerRestoreBtn = document.getElementById('btn-trigger-restore');
+        const restoreFileInput = document.getElementById('input-restore-file');
+
+        if (triggerRestoreBtn && restoreFileInput) {
+          triggerRestoreBtn.addEventListener('click', () => {
+            restoreFileInput.value = '';
+            restoreFileInput.click();
+          });
+
+          restoreFileInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              try {
+                const data = JSON.parse(event.target.result);
+                if (!data || typeof data !== 'object') {
+                  throw new Error('الملف فارغ أو صيغته غير صحيحة');
+                }
+
+                let itemsRestored = 0;
+
+                if (Array.isArray(data.sales)) {
+                  state.sales = data.sales;
+                  itemsRestored++;
+                }
+
+                if (Array.isArray(data.stockNeeds)) {
+                  state.stockNeeds = data.stockNeeds;
+                  itemsRestored++;
+                }
+
+                if (Array.isArray(data.creditCustomers)) {
+                  state.creditCustomers = data.creditCustomers.map(c => {
+                    if (!c.id) c.id = 'CRD-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000);
+                    if (!Array.isArray(c.items)) {
+                      const legacyName = (typeof c.items === 'string' && c.items.trim()) ? c.items : (c.itemsText || 'سلعة');
+                      c.items = [{
+                        id: 'ITM-' + Date.now().toString(36) + '-1',
+                        name: legacyName,
+                        total: Number(c.total || 0),
+                        paid: Number(c.paid || 0),
+                        remaining: Math.max(0, Number(c.total || 0) - Number(c.paid || 0)),
+                        date: c.date || new Date().toISOString(),
+                        status: (Number(c.total || 0) - Number(c.paid || 0)) <= 0 ? 'settled' : 'pending'
+                      }];
+                    }
+                    updateCustomerRecordTotals(c);
+                    return c;
+                  });
+                  itemsRestored++;
+                }
+
+                if (Array.isArray(data.debtSuppliers)) {
+                  state.debtSuppliers = data.debtSuppliers;
+                  itemsRestored++;
+                }
+
+                if (Array.isArray(data.presets)) {
+                  state.presets = data.presets;
+                  itemsRestored++;
+                }
+
+                if (data.userPins && typeof data.userPins === 'object') {
+                  state.userPins = Object.assign({}, DEFAULT_USER_PINS, data.userPins);
+                  itemsRestored++;
+                }
+
+                if (itemsRestored === 0) {
+                  throw new Error('الملف لا يحتوي على بيانات مقبولة');
+                }
+
+                saveLocalState();
+                if (state.syncToCloud) state.syncToCloud();
+
+                renderAll();
+                renderManagerPINDisplay();
+                renderPresets();
+
+                modal.classList.add('hidden');
+                playCashSound();
+                showToast(`تم استرجاع جميع المعلومات والأكواد بنجاح (${state.sales.length} مبيعات، ${state.stockNeeds.length} سلعة، ${state.creditCustomers.length} كريدي)! 📥✅`);
+              } catch (err) {
+                console.error('Restore error:', err);
+                showToast('فشل استرجاع النسخة: ' + err.message, true);
+              }
+            };
+            reader.readAsText(file);
           });
         }
       }
@@ -3716,6 +4335,262 @@
         }
       }
 
+
+      function setupNewFeaturesModals() {
+        // 1. Send Sale to Stock Modal
+        const modalSendStock = document.getElementById("modal-send-sale-to-stock");
+        const formSendStock = document.getElementById("form-send-sale-to-stock");
+        const closeSendStockBtn = document.getElementById("btn-close-send-stock-modal");
+        const cancelSendStockBtn = document.getElementById("btn-cancel-send-stock");
+        const catSelect = document.getElementById("send-stock-category");
+
+        function hideSendStockModal() {
+          if (modalSendStock) modalSendStock.classList.add("hidden");
+          state.activeSendToStockSale = null;
+        }
+
+        if (closeSendStockBtn) closeSendStockBtn.addEventListener("click", hideSendStockModal);
+        if (cancelSendStockBtn) cancelSendStockBtn.addEventListener("click", hideSendStockModal);
+
+        if (catSelect) {
+          catSelect.addEventListener("change", () => {
+            highlightStockPill(catSelect.value);
+          });
+        }
+
+        document.querySelectorAll("#send-stock-pills-container .stock-pill-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const cat = btn.getAttribute("data-cat");
+            if (catSelect) catSelect.value = cat;
+            highlightStockPill(cat);
+          });
+        });
+
+        if (formSendStock) {
+          formSendStock.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const name = (document.getElementById("send-stock-name")?.value || "").trim();
+            const cat = catSelect?.value || "افشور";
+            const qty = Math.max(1, parseInt(document.getElementById("send-stock-qty")?.value || 1, 10));
+            const priority = document.getElementById("send-stock-priority")?.value || "عادي";
+
+            if (!name) {
+              showToast("يرجى كتابة اسم السلعة المطلوبة!", true);
+              return;
+            }
+
+            const newStockItem = {
+              id: "STK-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 1000),
+              name: name,
+              category: cat,
+              qty: qty,
+              priority: priority,
+              addedBy: state.activeUser || "المحل",
+              date: new Date().toISOString(),
+              status: "pending"
+            };
+
+            state.stockNeeds.unshift(newStockItem);
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+
+            playCashSound();
+            showToast(`تم إرسال "${name}" إلى السلعة لي خاصا فـ فرع (${cat}) بنجاح! 📦`);
+            hideSendStockModal();
+            renderStockSection();
+          });
+        }
+
+        // 2. Manager Edit Sale Modal
+        const modalEditSale = document.getElementById("modal-edit-sale");
+        const formEditSale = document.getElementById("form-edit-sale");
+        const closeEditSaleBtn = document.getElementById("btn-close-edit-sale-modal");
+        const cancelEditSaleBtn = document.getElementById("btn-cancel-edit-sale");
+        const editSalePriceInp = document.getElementById("edit-sale-unit-price");
+        const editSaleQtyInp = document.getElementById("edit-sale-qty");
+        const editSaleTotalSpan = document.getElementById("edit-sale-calc-total");
+
+        function hideEditSaleModal() {
+          if (modalEditSale) modalEditSale.classList.add("hidden");
+          state.activeEditingSale = null;
+        }
+
+        if (closeEditSaleBtn) closeEditSaleBtn.addEventListener("click", hideEditSaleModal);
+        if (cancelEditSaleBtn) cancelEditSaleBtn.addEventListener("click", hideEditSaleModal);
+
+        function updateEditSaleCalc() {
+          const p = parseFloat(editSalePriceInp?.value || 0);
+          const q = parseInt(editSaleQtyInp?.value || 1, 10);
+          const t = Math.max(0, p * q);
+          if (editSaleTotalSpan) editSaleTotalSpan.textContent = `${t.toFixed(0)} DH`;
+        }
+
+        if (editSalePriceInp) editSalePriceInp.addEventListener("input", updateEditSaleCalc);
+        if (editSaleQtyInp) editSaleQtyInp.addEventListener("input", updateEditSaleCalc);
+
+        if (formEditSale) {
+          formEditSale.addEventListener("submit", (e) => {
+            e.preventDefault();
+            if (!state.isManager) {
+              showToast("تعديل المبيعات متاح للمدير فقط!", true);
+              return;
+            }
+
+            const saleId = document.getElementById("edit-sale-id")?.value;
+            const name = (document.getElementById("edit-sale-name")?.value || "").trim();
+            const unitPrice = parseFloat(editSalePriceInp?.value || 0);
+            const qty = Math.max(1, parseInt(editSaleQtyInp?.value || 1, 10));
+            const seller = document.getElementById("edit-sale-seller")?.value || "نورالدين";
+
+            if (!name) {
+              showToast("يرجى كتابة اسم السلعة!", true);
+              return;
+            }
+
+            const sale = state.sales.find(s => s.id === saleId);
+            if (sale) {
+              sale.name = name;
+              sale.unitPrice = unitPrice;
+              sale.qty = qty;
+              sale.totalPrice = unitPrice * qty;
+              sale.seller = seller;
+
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+
+              playCashSound();
+              showToast(`تم تعديل وحفظ عملية البيع "${name}" بنجاح! ✏️`);
+              hideEditSaleModal();
+              renderAll();
+            }
+          });
+        }
+
+        // 3. Manager Edit Stock Modal
+        const modalEditStock = document.getElementById("modal-edit-stock");
+        const formEditStock = document.getElementById("form-edit-stock");
+        const closeEditStockBtn = document.getElementById("btn-close-edit-stock-modal");
+        const cancelEditStockBtn = document.getElementById("btn-cancel-edit-stock");
+
+        function hideEditStockModal() {
+          if (modalEditStock) modalEditStock.classList.add("hidden");
+          state.activeEditingStock = null;
+        }
+
+        if (closeEditStockBtn) closeEditStockBtn.addEventListener("click", hideEditStockModal);
+        if (cancelEditStockBtn) cancelEditStockBtn.addEventListener("click", hideEditStockModal);
+
+        if (formEditStock) {
+          formEditStock.addEventListener("submit", (e) => {
+            e.preventDefault();
+            if (!state.isManager) {
+              showToast("تعديل السلع متاح للمدير فقط!", true);
+              return;
+            }
+
+            const stockId = document.getElementById("edit-stock-id")?.value;
+            const name = (document.getElementById("edit-stock-name")?.value || "").trim();
+            const cat = document.getElementById("edit-stock-cat")?.value || "افشور";
+            const qty = Math.max(1, parseInt(document.getElementById("edit-stock-qty")?.value || 1, 10));
+            const priority = document.getElementById("edit-stock-priority")?.value || "عادي";
+            const addedBy = document.getElementById("edit-stock-addedby")?.value || "نورالدين";
+
+            if (!name) {
+              showToast("يرجى كتابة اسم السلعة!", true);
+              return;
+            }
+
+            const item = state.stockNeeds.find(i => i.id === stockId);
+            if (item) {
+              item.name = name;
+              item.category = cat;
+              item.qty = qty;
+              item.priority = priority;
+              item.addedBy = addedBy;
+
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+
+              playCashSound();
+              showToast(`تم تعديل السلعة لي خاصا "${name}" بنجاح! ✏️`);
+              hideEditStockModal();
+              renderStockSection();
+            }
+          });
+        }
+
+        // 4. Manager Edit Customer Credit Item Modal
+        const modalEditCredit = document.getElementById("modal-edit-credit-item");
+        const formEditCredit = document.getElementById("form-edit-credit-item");
+        const closeEditCreditBtn = document.getElementById("btn-close-edit-credit-modal");
+        const cancelEditCreditBtn = document.getElementById("btn-cancel-edit-credit");
+        const editCreditTotalInp = document.getElementById("edit-credit-item-total");
+        const editCreditPaidInp = document.getElementById("edit-credit-item-paid");
+        const editCreditRemSpan = document.getElementById("edit-credit-item-calc-rem");
+
+        function hideEditCreditModal() {
+          if (modalEditCredit) modalEditCredit.classList.add("hidden");
+          state.activeEditingCreditCust = null;
+          state.activeEditingCreditItem = null;
+        }
+
+        if (closeEditCreditBtn) closeEditCreditBtn.addEventListener("click", hideEditCreditModal);
+        if (cancelEditCreditBtn) cancelEditCreditBtn.addEventListener("click", hideEditCreditModal);
+
+        function updateEditCreditCalc() {
+          const tot = Math.max(0, parseFloat(editCreditTotalInp?.value || 0));
+          const paid = Math.max(0, parseFloat(editCreditPaidInp?.value || 0));
+          const rem = Math.max(0, tot - paid);
+          if (editCreditRemSpan) editCreditRemSpan.textContent = `${rem.toFixed(0)} DH`;
+        }
+
+        if (editCreditTotalInp) editCreditTotalInp.addEventListener("input", updateEditCreditCalc);
+        if (editCreditPaidInp) editCreditPaidInp.addEventListener("input", updateEditCreditCalc);
+
+        if (formEditCredit) {
+          formEditCredit.addEventListener("submit", (e) => {
+            e.preventDefault();
+            if (!state.isManager) {
+              showToast("تعديل الكريدي متاح للمدير فقط!", true);
+              return;
+            }
+
+            const custId = document.getElementById("edit-credit-cust-id")?.value;
+            const itemId = document.getElementById("edit-credit-item-id")?.value;
+            const name = (document.getElementById("edit-credit-item-name")?.value || "").trim();
+            const total = Math.max(0, parseFloat(editCreditTotalInp?.value || 0));
+            const paid = Math.max(0, parseFloat(editCreditPaidInp?.value || 0));
+            const remaining = Math.max(0, total - paid);
+
+            if (!name) {
+              showToast("يرجى كتابة اسم السلعة!", true);
+              return;
+            }
+
+            const cust = state.creditCustomers.find(c => c.id === custId);
+            if (cust && Array.isArray(cust.items)) {
+              const item = cust.items.find(it => it.id === itemId);
+              if (item) {
+                item.name = name;
+                item.total = total;
+                item.paid = paid;
+                item.remaining = remaining;
+                item.status = remaining <= 0 ? "settled" : "pending";
+
+                updateCustomerRecordTotals(cust);
+                saveLocalState();
+                if (state.syncToCloud) state.syncToCloud();
+
+                playCashSound();
+                showToast(`تم تعديل سلعة الكريدي "${name}" بنجاح! ✏️`);
+                hideEditCreditModal();
+                renderCreditSection();
+              }
+            }
+          });
+        }
+      }
+
       function init() {
         migrateAndLoadData();
         setupRealtimeSync();
@@ -3727,6 +4602,7 @@
         setupStockSection();
         setupCreditSection();
         setupManagerSpace();
+        setupNewFeaturesModals();
         updateUserHeader();
         renderAll();
 
