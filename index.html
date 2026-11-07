@@ -530,20 +530,29 @@
               </div>
             </div>
 
-            <!-- Dynamic Multi-Item Rows -->
+            <!-- Dynamic Multi-Item Rows with Direction Toggle -->
             <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <label class="text-xs font-bold text-slate-700">السلع أو الإصلاحات اللي خدا الزبون:</label>
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <label class="text-xs font-black text-slate-800 block">تفاصيل المعاملات مع الزبون:</label>
+                  <span class="text-[10px] text-slate-500 font-bold">يمكنك تحديد: واش خدا الزبون من عندك أو خديتي نتا من عندو شي حاجة</span>
+                </div>
                 <button type="button" id="btn-add-credit-item-row"
                   class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-black flex items-center gap-1 cursor-pointer">
-                  <span>➕</span> <span>زيد سلعة أخرى لنفس الزبون</span>
+                  <span>➕</span> <span>زيد عملية أخرى لنفس الحساب</span>
                 </button>
               </div>
 
               <div id="credit-items-rows-container" class="space-y-2">
                 <div class="credit-item-row p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2">
+                  <div class="w-full sm:w-44">
+                    <select class="row-item-type w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-black text-slate-800 outline-none focus:border-rose-500">
+                      <option value="cust_owes_shop">📤 خدا الزبون (كنسالوه)</option>
+                      <option value="shop_owes_cust">📥 خديت من عندو (كيتسالنا)</option>
+                    </select>
+                  </div>
                   <div class="flex-1">
-                    <input type="text" placeholder="اسم السلعة (مثلا: lcd a12)" required
+                    <input type="text" placeholder="اسم السلعة (مثلا: هاتف A12 أو بياس...)" required
                       class="row-item-name w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-rose-500">
                   </div>
                   <div class="w-full sm:w-24">
@@ -554,7 +563,7 @@
                     <input type="number" placeholder="الدفع DH" min="0" step="any" value="0"
                       class="row-item-paid w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-black text-emerald-600 outline-none focus:border-rose-500 text-center">
                   </div>
-                  <div class="w-full sm:w-24 text-center">
+                  <div class="w-full sm:w-28 text-center">
                     <span class="row-item-rem text-xs font-black text-rose-600 bg-rose-50 px-2 py-1.5 rounded-lg border border-rose-200 block truncate">باقي: 0 DH</span>
                   </div>
                   <div class="w-8 text-center hidden row-remove-btn-wrap">
@@ -564,20 +573,28 @@
               </div>
             </div>
 
-            <!-- Live Grand Total Bar -->
-            <div class="p-3 bg-slate-900 text-white rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs">
-              <div>
-                <span class="text-slate-400">المجموع:</span>
-                <strong id="form-calc-grand-total" class="text-white mr-1 text-sm font-mono">0 DH</strong>
+            <!-- Live Net Grand Total Bar -->
+            <div class="p-3 bg-slate-900 text-white rounded-xl space-y-1.5 text-xs">
+              <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-1.5">
+                <div>
+                  <span class="text-slate-400">خدا الزبون (كنسالوه):</span>
+                  <strong id="form-calc-grand-cust-total" class="text-rose-400 mr-1 text-sm font-mono">0 DH</strong>
+                  <span class="text-[10px] text-slate-400 mr-1">(تسبيق: <span id="form-calc-grand-cust-paid" class="text-emerald-400">0 DH</span>)</span>
+                </div>
+                <div>
+                  <span class="text-slate-400">خديتي من عندو (كيتسالنا):</span>
+                  <strong id="form-calc-grand-shop-total" class="text-amber-400 mr-1 text-sm font-mono">0 DH</strong>
+                  <span class="text-[10px] text-slate-400 mr-1">(عطيتيه: <span id="form-calc-grand-shop-paid" class="text-emerald-400">0 DH</span>)</span>
+                </div>
               </div>
-              <div>
-                <span class="text-slate-400">التسبيق:</span>
-                <strong id="form-calc-grand-paid" class="text-emerald-400 mr-1 text-sm font-mono">0 DH</strong>
+              <div class="flex items-center justify-between pt-0.5">
+                <span class="text-slate-300 font-bold">النتيجة الصافية للحساب:</span>
+                <span id="form-calc-grand-net-label" class="text-sm sm:text-base font-black text-emerald-400 font-mono">البالانس: 0 DH</span>
               </div>
-              <div>
-                <span class="text-slate-400">الباقي فالكريدي:</span>
-                <strong id="form-calc-grand-rem" class="text-rose-400 mr-1 text-base font-black font-mono">0 DH</strong>
-              </div>
+              <!-- Hidden placeholders for backwards-compatibility -->
+              <span id="form-calc-grand-total" class="hidden">0 DH</span>
+              <span id="form-calc-grand-paid" class="hidden">0 DH</span>
+              <span id="form-calc-grand-rem" class="hidden">0 DH</span>
             </div>
 
             <button type="submit"
@@ -688,8 +705,17 @@
 
       <form id="form-modal-add-item" class="space-y-3 text-xs">
         <div>
-          <label class="block text-slate-700 font-bold mb-1">اسم السلعة (مثلا: conector a13):</label>
-          <input type="text" id="modal-new-item-name" placeholder="اكتب السلعة..." required autocomplete="off"
+          <label class="block text-slate-700 font-bold mb-1">نوع العملية (واش خدا الزبون أو خديتي نتا):</label>
+          <select id="modal-new-item-type" required
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-black text-slate-900">
+            <option value="cust_owes_shop">📤 خدا الزبون من عندي (كنسالوه)</option>
+            <option value="shop_owes_cust">📥 خديت أنا من عند الزبون (كيتسالنا)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة أو الخدمة:</label>
+          <input type="text" id="modal-new-item-name" placeholder="اكتب السلعة (مثلا: هاتف، شاشة، بياس...)" required autocomplete="off"
             class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-bold text-slate-900">
         </div>
 
@@ -998,7 +1024,16 @@
         <input type="hidden" id="edit-credit-item-id">
 
         <div>
-          <label class="block text-slate-700 font-bold mb-1">اسم السلعة:</label>
+          <label class="block text-slate-700 font-bold mb-1">نوع العملية:</label>
+          <select id="edit-credit-item-type" required
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-black text-slate-900">
+            <option value="cust_owes_shop">📤 خدا الزبون من عندي (كنسالوه)</option>
+            <option value="shop_owes_cust">📥 خديت أنا من عند الزبون (كيتسالنا)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة أو العملية:</label>
           <input type="text" id="edit-credit-item-name" required autocomplete="off"
             class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-rose-500 font-bold text-slate-900">
         </div>
@@ -1429,22 +1464,51 @@
 
       function updateCustomerRecordTotals(cust) {
         if (!cust.items) cust.items = [];
-        let total = 0;
-        let paid = 0;
-        let remaining = 0;
+        let totalCustOwes = 0;   // مجموع السلع اللي خدا من عندنا
+        let paidCustOwes = 0;    // تسبيقات السلع اللي خدا من عندنا
+        let netRemCustOwes = 0;  // الباقي من السلع اللي خدا الزبون
+
+        let totalShopOwes = 0;   // مجموع السلع اللي خدينا حنا من عند الزبون
+        let paidShopOwes = 0;    // التسبيقات اللي عطينا للزبون عليها
+        let netRemShopOwes = 0;  // الباقي اللي كيتسالنا الزبون
 
         cust.items.forEach(it => {
-          total += Number(it.total || 0);
-          paid += Number(it.paid || 0);
-          it.remaining = Math.max(0, Number(it.total || 0) - Number(it.paid || 0));
-          remaining += it.remaining;
-          it.status = it.remaining <= 0 ? 'settled' : 'pending';
+          if (!it.type) it.type = "cust_owes_shop"; // default legacy
+          const itTot = Number(it.total || 0);
+          const itPaid = Number(it.paid || 0);
+          it.remaining = Math.max(0, itTot - itPaid);
+          it.status = it.remaining <= 0 ? "settled" : "pending";
+
+          if (it.type === "shop_owes_cust") {
+            totalShopOwes += itTot;
+            paidShopOwes += itPaid;
+            netRemShopOwes += it.remaining;
+          } else {
+            totalCustOwes += itTot;
+            paidCustOwes += itPaid;
+            netRemCustOwes += it.remaining;
+          }
         });
 
-        cust.total = total;
-        cust.paid = paid;
-        cust.remaining = remaining;
-        cust.status = remaining <= 0 ? 'settled' : 'pending';
+        cust.totalCustOwes = totalCustOwes;
+        cust.paidCustOwes = paidCustOwes;
+        cust.remCustOwes = netRemCustOwes;
+
+        cust.totalShopOwes = totalShopOwes;
+        cust.paidShopOwes = paidShopOwes;
+        cust.remShopOwes = netRemShopOwes;
+
+        // صافي الحساب النهائي:
+        // إيلا remCustOwes >= remShopOwes -> كنسالوه الفرق
+        // إيلا remShopOwes > remCustOwes -> كيتسالنا الفرق
+        const netDifference = netRemCustOwes - netRemShopOwes;
+        cust.netDifference = netDifference;
+        cust.remaining = Math.abs(netDifference);
+
+        // backward compatibility for generic filters
+        cust.total = totalCustOwes;
+        cust.paid = paidCustOwes;
+        cust.status = (netRemCustOwes <= 0 && netRemShopOwes <= 0) ? "settled" : "pending";
       }
 
       // 1. Automatic Data Recovery & Migration (Preserves all previous data)
@@ -2339,21 +2403,72 @@
         const saveAddItemModal = document.getElementById('btn-save-modal-item');
 
         function recalcCustomerFormTotals() {
-          let gTotal = 0, gPaid = 0, gRem = 0;
+          let custTot = 0, custPaid = 0, custNet = 0;
+          let shopTot = 0, shopPaid = 0, shopNet = 0;
+
           const rows = itemsRowsContainer.querySelectorAll('.credit-item-row');
           rows.forEach(r => {
+            const typeSelect = r.querySelector('.row-item-type');
             const totInp = r.querySelector('.row-item-total');
             const paidInp = r.querySelector('.row-item-paid');
             const remSpan = r.querySelector('.row-item-rem');
+
+            const isShopOwes = typeSelect ? (typeSelect.value === "shop_owes_cust") : false;
             const tot = Math.max(0, parseFloat(totInp?.value || 0));
             const paid = Math.max(0, parseFloat(paidInp?.value || 0));
             const rem = Math.max(0, tot - paid);
-            if (remSpan) remSpan.textContent = `باقي: ${rem.toFixed(0)} DH`;
-            gTotal += tot; gPaid += paid; gRem += rem;
+
+            if (remSpan) {
+              remSpan.textContent = `باقي: ${rem.toFixed(0)} DH`;
+              if (isShopOwes) {
+                remSpan.className = "row-item-rem text-xs font-black text-amber-700 bg-amber-50 px-2 py-1.5 rounded-lg border border-amber-200 block truncate";
+              } else {
+                remSpan.className = "row-item-rem text-xs font-black text-rose-600 bg-rose-50 px-2 py-1.5 rounded-lg border border-rose-200 block truncate";
+              }
+            }
+
+            if (isShopOwes) {
+              shopTot += tot;
+              shopPaid += paid;
+              shopNet += rem;
+            } else {
+              custTot += tot;
+              custPaid += paid;
+              custNet += rem;
+            }
           });
-          document.getElementById('form-calc-grand-total').textContent = `${gTotal.toFixed(0)} DH`;
-          document.getElementById('form-calc-grand-paid').textContent = `${gPaid.toFixed(0)} DH`;
-          document.getElementById('form-calc-grand-rem').textContent = `${gRem.toFixed(0)} DH`;
+
+          const elCustTot = document.getElementById('form-calc-grand-cust-total');
+          const elCustPaid = document.getElementById('form-calc-grand-cust-paid');
+          const elShopTot = document.getElementById('form-calc-grand-shop-total');
+          const elShopPaid = document.getElementById('form-calc-grand-shop-paid');
+          const elNetLabel = document.getElementById('form-calc-grand-net-label');
+
+          if (elCustTot) elCustTot.textContent = `${custTot.toFixed(0)} DH`;
+          if (elCustPaid) elCustPaid.textContent = `${custPaid.toFixed(0)} DH`;
+          if (elShopTot) elShopTot.textContent = `${shopTot.toFixed(0)} DH`;
+          if (elShopPaid) elShopPaid.textContent = `${shopPaid.toFixed(0)} DH`;
+
+          const netDiff = custNet - shopNet;
+          if (elNetLabel) {
+            if (netDiff > 0) {
+              elNetLabel.className = "text-sm sm:text-base font-black text-rose-400 font-mono";
+              elNetLabel.textContent = `كنسالو الزبون صافي: ${netDiff.toFixed(0)} DH`;
+            } else if (netDiff < 0) {
+              elNetLabel.className = "text-sm sm:text-base font-black text-amber-400 font-mono";
+              elNetLabel.textContent = `الزبون كيتسالنا صافي: ${Math.abs(netDiff).toFixed(0)} DH`;
+            } else {
+              elNetLabel.className = "text-sm sm:text-base font-black text-emerald-400 font-mono";
+              elNetLabel.textContent = "الحساب متساوي تماماً (البالانس: 0 DH)";
+            }
+          }
+
+          const legacyTot = document.getElementById('form-calc-grand-total');
+          const legacyPaid = document.getElementById('form-calc-grand-paid');
+          const legacyRem = document.getElementById('form-calc-grand-rem');
+          if (legacyTot) legacyTot.textContent = `${custTot.toFixed(0)} DH`;
+          if (legacyPaid) legacyPaid.textContent = `${custPaid.toFixed(0)} DH`;
+          if (legacyRem) legacyRem.textContent = `${Math.abs(netDiff).toFixed(0)} DH`;
         }
 
         function checkRowRemoveButtons() {
@@ -2368,9 +2483,11 @@
         }
 
         function attachRowListeners(row) {
+          const typeSelect = row.querySelector('.row-item-type');
           const totInp = row.querySelector('.row-item-total');
           const paidInp = row.querySelector('.row-item-paid');
           const removeBtn = row.querySelector('.btn-remove-row');
+          if (typeSelect) typeSelect.addEventListener('change', recalcCustomerFormTotals);
           [totInp, paidInp].forEach(inp => inp && inp.addEventListener('input', recalcCustomerFormTotals));
           if (removeBtn) {
             removeBtn.addEventListener('click', () => {
@@ -2392,8 +2509,14 @@
             const newRow = document.createElement('div');
             newRow.className = 'credit-item-row p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2';
             newRow.innerHTML = `
+              <div class="w-full sm:w-44">
+                <select class="row-item-type w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-black text-slate-800 outline-none focus:border-rose-500">
+                  <option value="cust_owes_shop">📤 خدا الزبون (كنسالوه)</option>
+                  <option value="shop_owes_cust">📥 خديت من عندو (كيتسالنا)</option>
+                </select>
+              </div>
               <div class="flex-1">
-                <input type="text" placeholder="اسم السلعة (مثلا: conector a13)" required
+                <input type="text" placeholder="اسم السلعة (مثلا: هاتف A12 أو بياس...)" required
                   class="row-item-name w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-rose-500">
               </div>
               <div class="w-full sm:w-24">
@@ -2404,7 +2527,7 @@
                 <input type="number" placeholder="الدفع DH" min="0" step="any" value="0"
                   class="row-item-paid w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-black text-emerald-600 outline-none focus:border-rose-500 text-center">
               </div>
-              <div class="w-full sm:w-24 text-center">
+              <div class="w-full sm:w-28 text-center">
                 <span class="row-item-rem text-xs font-black text-rose-600 bg-rose-50 px-2 py-1.5 rounded-lg border border-rose-200 block truncate">باقي: 0 DH</span>
               </div>
               <div class="w-8 text-center row-remove-btn-wrap">
@@ -2491,9 +2614,12 @@
             const itemsCollected = [];
             const rows = itemsRowsContainer.querySelectorAll('.credit-item-row');
             rows.forEach(r => {
+              const typeSelect = r.querySelector('.row-item-type');
               const nameInp = r.querySelector('.row-item-name');
               const totInp = r.querySelector('.row-item-total');
               const paidInp = r.querySelector('.row-item-paid');
+
+              const itemType = typeSelect ? typeSelect.value : 'cust_owes_shop';
               const itemName = (nameInp?.value || '').trim();
               const itemTotal = Math.max(0, parseFloat(totInp?.value || 0));
               const itemPaid = Math.max(0, parseFloat(paidInp?.value || 0));
@@ -2502,6 +2628,7 @@
               if (itemName) {
                 itemsCollected.push({
                   id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                  type: itemType,
                   name: itemName,
                   total: itemTotal,
                   paid: itemPaid,
@@ -2546,8 +2673,14 @@
             inputCustPhone.value = '';
             itemsRowsContainer.innerHTML = `
               <div class="credit-item-row p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2">
+                <div class="w-full sm:w-44">
+                  <select class="row-item-type w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-black text-slate-800 outline-none focus:border-rose-500">
+                    <option value="cust_owes_shop">📤 خدا الزبون (كنسالوه)</option>
+                    <option value="shop_owes_cust">📥 خديت من عندو (كيتسالنا)</option>
+                  </select>
+                </div>
                 <div class="flex-1">
-                  <input type="text" placeholder="اسم السلعة (مثلا: lcd a12)" required
+                  <input type="text" placeholder="اسم السلعة (مثلا: هاتف A12 أو بياس...)" required
                     class="row-item-name w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-rose-500">
                 </div>
                 <div class="w-full sm:w-24">
@@ -2558,7 +2691,7 @@
                   <input type="number" placeholder="الدفع DH" min="0" step="any" value="0"
                     class="row-item-paid w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-black text-emerald-600 outline-none focus:border-rose-500 text-center">
                 </div>
-                <div class="w-full sm:w-24 text-center">
+                <div class="w-full sm:w-28 text-center">
                   <span class="row-item-rem text-xs font-black text-rose-600 bg-rose-50 px-2 py-1.5 rounded-lg border border-rose-200 block truncate">باقي: 0 DH</span>
                 </div>
                 <div class="w-8 text-center hidden row-remove-btn-wrap">
@@ -2595,10 +2728,12 @@
               return;
             }
 
+            const typeSelect = document.getElementById('modal-new-item-type');
             const nameInput = document.getElementById('modal-new-item-name');
             const totalInput = document.getElementById('modal-new-item-total');
             const paidInput = document.getElementById('modal-new-item-paid');
 
+            const itemType = typeSelect ? typeSelect.value : 'cust_owes_shop';
             const name = (nameInput?.value || '').trim();
             const total = Math.max(0, parseFloat(totalInput?.value || 0));
             const paid = Math.max(0, parseFloat(paidInput?.value || 0));
@@ -2612,6 +2747,7 @@
             if (!Array.isArray(cust.items)) cust.items = [];
             cust.items.push({
               id: 'ITM-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+              type: itemType,
               name: name,
               total: total,
               paid: paid,
@@ -2753,7 +2889,10 @@
 
       function renderCreditSection() {
         const pendingCust = state.creditCustomers.filter(c => c.status !== 'settled');
-        const totalCustMoney = pendingCust.reduce((acc, c) => acc + (c.remaining || 0), 0);
+        const totalCustMoney = pendingCust.reduce((acc, c) => {
+          const diff = c.netDifference !== undefined ? c.netDifference : ((c.remCustOwes || 0) - (c.remShopOwes || 0));
+          return acc + (diff > 0 ? diff : 0);
+        }, 0);
         document.getElementById('kpi-customers-credit').textContent = `${totalCustMoney} DH`;
         document.getElementById('kpi-customers-count').textContent = `${pendingCust.length} زبون باقي كيتسال`;
 
@@ -2991,11 +3130,51 @@
             if (cust && cust.phone) {
               let cleanPhone = cust.phone.replace(/[^0-9]/g, '');
               if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
-              let msg = `السلام عليكم أخي ${cust.name}، كنتواصلو معاك من محل إلكترو نور الدين بخصوص تفاصيل باقي الحساب:\n\n`;
-              cust.items.forEach(it => {
-                if (it.remaining > 0) msg += `• *${it.name}*: الثمن ${it.total} DH (مدفوع: ${it.paid} DH | باقي: *${it.remaining} DH*)\n`;
-              });
-              msg += `\n💰 *إجمالي المبلغ المتبقي: ${cust.remaining} درهم.*\nمرحباً بك فالمحل وشكراً لك!`;
+
+              let msg = `السلام عليكم أخي *${cust.name}*،\n`;
+              msg += `كنتواصلو معاك من محل *إلكترو نور الدين* بخصوص كشف الحساب وتفاصيل المعاملات بيناتنا:\n\n`;
+
+              // 1. السلع اللي خدا الزبون من المحل
+              const custOwedItems = cust.items.filter(it => it.type !== 'shop_owes_cust');
+              if (custOwedItems.length > 0) {
+                msg += `📤 *السلع اللي خديتي من عندنا (كنسالوك):*\n`;
+                custOwedItems.forEach((it, idx) => {
+                  const itDate = it.date ? new Date(it.date).toLocaleDateString('ar-MA', { day: 'numeric', month: 'short', year: 'numeric' }) : '--';
+                  const statusNote = it.remaining <= 0 ? '(خالصة ✅)' : `(مدفوع: ${it.paid} DH | باقي: *${it.remaining} DH*)`;
+                  msg += `${idx + 1}. *${it.name}* 🗓️ بتاريخ: ${itDate}\n`;
+                  msg += `   • الثمن: ${it.total} DH ${statusNote}\n`;
+                });
+                msg += `   ───────────────\n`;
+                msg += `   مجموع اللي خديتي: *${cust.totalCustOwes || 0} DH* (الباقي: *${cust.remCustOwes || 0} DH*)\n\n`;
+              }
+
+              // 2. السلع اللي خدا المحل من عند الزبون
+              const shopOwedItems = cust.items.filter(it => it.type === 'shop_owes_cust');
+              if (shopOwedItems.length > 0) {
+                msg += `📥 *السلع اللي خدينا من عندك (كتسالنا):*\n`;
+                shopOwedItems.forEach((it, idx) => {
+                  const itDate = it.date ? new Date(it.date).toLocaleDateString('ar-MA', { day: 'numeric', month: 'short', year: 'numeric' }) : '--';
+                  const statusNote = it.remaining <= 0 ? '(مردودة كاملة ✅)' : `(عطيناك: ${it.paid} DH | باقي: *${it.remaining} DH*)`;
+                  msg += `${idx + 1}. *${it.name}* 🗓️ بتاريخ: ${itDate}\n`;
+                  msg += `   • الثمن: ${it.total} DH ${statusNote}\n`;
+                });
+                msg += `   ───────────────\n`;
+                msg += `   مجموع اللي خدينا منك: *${cust.totalShopOwes || 0} DH* (الباقي: *${cust.remShopOwes || 0} DH*)\n\n`;
+              }
+
+              // 3. الصافي النهائي بعد المقاصة
+              msg += `═══════════════════\n`;
+              const netDiff = cust.netDifference !== undefined ? cust.netDifference : ((cust.remCustOwes || 0) - (cust.remShopOwes || 0));
+              if (netDiff > 0) {
+                msg += `💰 *الصافي النهائي:* الباقي كنسالوك: *${Math.abs(netDiff)} درهم*.\n`;
+              } else if (netDiff < 0) {
+                msg += `💰 *الصافي النهائي:* الباقي كتسالنا نتا: *${Math.abs(netDiff)} درهم*.\n`;
+              } else {
+                msg += `✅ *الصافي النهائي:* الحساب متساوي تماماً (0 درهم باقي).\n`;
+              }
+              msg += `═══════════════════\n`;
+              msg += `شكراً جزيلاً لتعاملك معنا ومرحباً بك في المحل فـ أي وقت! 🙏✨`;
+
               window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
             }
           });
@@ -3557,6 +3736,8 @@
         document.getElementById('edit-credit-cust-id').value = cust.id;
         document.getElementById('edit-credit-item-id').value = item.id;
         document.getElementById('edit-credit-item-cust-name').textContent = `الزبون: ${cust.name}`;
+        const typeSelect = document.getElementById('edit-credit-item-type');
+        if (typeSelect) typeSelect.value = item.type || 'cust_owes_shop';
         document.getElementById('edit-credit-item-name').value = item.name;
         document.getElementById('edit-credit-item-total').value = item.total;
         document.getElementById('edit-credit-item-paid').value = item.paid;
@@ -4211,6 +4392,8 @@
             if (cust && Array.isArray(cust.items)) {
               const item = cust.items.find(it => it.id === itemId);
               if (item) {
+                const typeSelect = document.getElementById('edit-credit-item-type');
+                item.type = typeSelect ? typeSelect.value : (item.type || 'cust_owes_shop');
                 item.name = (document.getElementById('edit-credit-item-name')?.value || '').trim();
                 item.total = Math.max(0, parseFloat(editCreditTotalInp?.value || 0));
                 item.paid = Math.max(0, parseFloat(editCreditPaidInp?.value || 0));
