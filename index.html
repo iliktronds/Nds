@@ -276,6 +276,27 @@
             </div>
           </div>
 
+          <!-- Delivery & Payment Status Selector (جديد: واش خرج وتخلص ولا مزال فالمحل) -->
+          <div class="bg-slate-50 border border-slate-200 p-2.5 rounded-xl space-y-1.5">
+            <label class="block text-xs font-bold text-slate-800">حالة السلعة والتخليص (واش خرج الهاتف/السلعة ولا مزال؟):</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 bg-emerald-50/80 border border-emerald-300 rounded-xl cursor-pointer hover:bg-emerald-100/60 transition">
+                <input type="radio" name="input-sale-delivery-status" value="delivered" checked class="w-4 h-4 accent-emerald-600 cursor-pointer">
+                <div>
+                  <span class="font-black text-emerald-800 text-xs block">🚀 داه مولاه وخَلّص (خرج دابا)</span>
+                  <span class="text-[10px] text-emerald-600 font-semibold block">يتحسب فالحين فالأرباح والصندوق ✅</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-amber-50/80 border border-amber-300 rounded-xl cursor-pointer hover:bg-amber-100/60 transition">
+                <input type="radio" name="input-sale-delivery-status" value="in_shop" class="w-4 h-4 accent-amber-600 cursor-pointer">
+                <div>
+                  <span class="font-black text-amber-900 text-xs block">⏳ مازال فالمحل (متخلصاتش)</span>
+                  <span class="text-[10px] text-amber-700 font-semibold block">مغاديش يتحسب فالأرباح حتى يخرج ⚠️</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <button type="submit"
             class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-black rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
             <span>✅</span>
@@ -353,12 +374,35 @@
 
         <!-- Detailed Sales History List -->
         <section class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-wrap gap-2">
             <h3 class="font-black text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
               <span>🧾</span>
               <span>سجل عمليات البيع بالتفصيل</span>
             </h3>
-            <span id="sales-badge-count" class="text-[11px] font-black bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full">0 عملية</span>
+            <div class="flex items-center gap-2">
+              <span id="sales-badge-count" class="text-[11px] font-black bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full">0 عملية</span>
+            </div>
+          </div>
+
+          <!-- Tabs for Delivery Status Filtering (جديد: فلترة السلعة لي خرجات ولي مازال فالمحل) -->
+          <div class="flex items-center justify-between bg-slate-100 p-1 rounded-xl text-xs flex-wrap gap-1">
+            <div class="flex items-center gap-1">
+              <button type="button" id="tab-sales-filter-all"
+                class="sales-deliv-tab px-2.5 py-1 rounded-lg bg-white text-slate-900 font-black shadow-xs cursor-pointer">
+                الكل
+              </button>
+              <button type="button" id="tab-sales-filter-delivered"
+                class="sales-deliv-tab px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold cursor-pointer">
+                ✅ خرجات وتخلصات
+              </button>
+              <button type="button" id="tab-sales-filter-inshop"
+                class="sales-deliv-tab px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold cursor-pointer">
+                ⏳ مازال فالمحل
+              </button>
+            </div>
+            <span id="sales-inshop-counter" class="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+              0 فالمحل
+            </span>
           </div>
 
           <div id="sales-list-container" class="divide-y divide-slate-100 max-h-[420px] overflow-y-auto">
@@ -995,6 +1039,15 @@
           </div>
         </div>
 
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">حالة السلعة والتسليم:</label>
+          <select id="edit-sale-delivery-status"
+            class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white font-black text-xs text-slate-900">
+            <option value="delivered">✅ خرج من المحل وتخلص (محسوب فالأرباح)</option>
+            <option value="in_shop">⏳ مازال فالمحل ومتخلصاتش (غير محسوب فالأرباح)</option>
+          </select>
+        </div>
+
         <label class="flex items-center gap-2 text-[11px] font-bold text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
           <input type="checkbox" id="edit-sale-remember-wholesale" checked class="w-4 h-4 accent-amber-600">
           <span>حفظ ثمن الجملة لهاد السلعة باش يتقيد أوتوماتيكياً فالمرات الجاية</span>
@@ -1515,6 +1568,7 @@
         roomCode: 'iliktronds_shop_permanent_cloud_v1',
         totalsFilter: 'all',
         salesCatFilter: 'all',
+        salesDeliveryFilter: 'all', // 'all', 'delivered', 'in_shop' 
         wholesaleFilter: 'today',
         stockFilter: 'pending',
         stockCatFilter: 'all',
@@ -3993,13 +4047,23 @@
         const todayStr = new Date().toDateString();
         const todaySales = state.sales.filter(s => new Date(s.date).toDateString() === todayStr);
 
-        const todayQty = todaySales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
-        const todayRev = todaySales.reduce((acc, s) => acc + (Number(s.totalPrice) || 0), 0);
-        const todayWholesale = todaySales.reduce((acc, s) => {
+        // Separate delivered sales (realized) vs in_shop (pending delivery/payment)
+        const deliveredSales = todaySales.filter(s => (s.deliveryStatus || 'delivered') !== 'in_shop');
+        const inShopSales = todaySales.filter(s => s.deliveryStatus === 'in_shop');
+
+        const todayDeliveredQty = deliveredSales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
+        const todayInShopQty = inShopSales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
+        const totalTodayQty = todayDeliveredQty + todayInShopQty;
+
+        // Realized revenue, wholesale cost, and net profit count ONLY delivered items
+        const todayRev = deliveredSales.reduce((acc, s) => acc + (Number(s.totalPrice) || 0), 0);
+        const todayWholesale = deliveredSales.reduce((acc, s) => {
           const wUnit = Number(s.wholesalePrice || 0);
           return acc + (wUnit * (Number(s.qty) || 1));
         }, 0);
         const todayProfit = todayRev - todayWholesale;
+
+        const inShopTotalValue = inShopSales.reduce((acc, s) => acc + (Number(s.totalPrice) || 0), 0);
 
         const elItems = document.getElementById('kpi-today-items');
         const elOps = document.getElementById('kpi-today-ops');
@@ -4009,10 +4073,14 @@
         const elProfit = document.getElementById('kpi-today-profit');
         const badgeMissingW = document.getElementById('badge-missing-wholesale');
 
-        if (elItems) elItems.textContent = todayQty;
-        if (elOps) elOps.textContent = `${todaySales.length} عملية بيع اليوم`;
+        if (elItems) elItems.textContent = totalTodayQty;
+        if (elOps) {
+          elOps.innerHTML = inShopSales.length > 0
+            ? `<span class="text-emerald-700 font-black">${deliveredSales.length} خرجات ✅</span> | <span class="text-amber-700 font-black">${inShopSales.length} فالمحل ⏳</span>`
+            : `${deliveredSales.length} عملية بيع اليوم`;
+        }
 
-        const missingWholesaleCount = todaySales.filter(s => !s.wholesalePrice || Number(s.wholesalePrice) <= 0).length;
+        const missingWholesaleCount = deliveredSales.filter(s => !s.wholesalePrice || Number(s.wholesalePrice) <= 0).length;
         if (badgeMissingW) {
           if (state.isManager && missingWholesaleCount > 0) {
             badgeMissingW.textContent = missingWholesaleCount;
@@ -4023,12 +4091,16 @@
         }
 
         if (state.isManager) {
-          if (elRev) elRev.textContent = `${todayRev.toFixed(0)} DH`;
+          if (elRev) {
+            elRev.innerHTML = inShopTotalValue > 0
+              ? `${todayRev.toFixed(0)} DH <span class="text-[11px] block font-bold text-amber-600">(+ ${inShopTotalValue.toFixed(0)} DH مازال فالمحل)</span>`
+              : `${todayRev.toFixed(0)} DH`;
+          }
           if (elWholesale) elWholesale.textContent = `${todayWholesale.toFixed(0)} DH`;
           if (elWholesaleNote) {
             elWholesaleNote.textContent = missingWholesaleCount > 0
-              ? `⚠️ ${missingWholesaleCount} مبيعات اليوم باقي بلا ثمن جملة`
-              : `✅ كل مبيعات اليوم محددة بالجملة`;
+              ? `⚠️ ${missingWholesaleCount} مبيعات خرجات باقي بلا ثمن جملة`
+              : `✅ تكلفة السلع اللي خرجات وتخلصات`;
           }
           if (elProfit) elProfit.textContent = `${todayProfit.toFixed(0)} DH`;
         } else {
@@ -4053,10 +4125,14 @@
           ? state.sales.filter(s => new Date(s.date).toDateString() === todayStr)
           : state.sales;
 
+        // Separate delivered (counted in realized profit) vs in_shop (pending delivery)
+        const deliveredSales = targetSales.filter(s => (s.deliveryStatus || 'delivered') !== 'in_shop');
+        const inShopSales = targetSales.filter(s => s.deliveryStatus === 'in_shop');
+
         let sumSales = 0;
         let sumWholesale = 0;
 
-        targetSales.forEach(s => {
+        deliveredSales.forEach(s => {
           const qty = Number(s.qty || 1);
           const rev = Number(s.totalPrice || 0);
           const wUnit = Number(s.wholesalePrice || 0);
@@ -4065,12 +4141,17 @@
         });
 
         const sumProfit = sumSales - sumWholesale;
+        const inShopValue = inShopSales.reduce((a, s) => a + (Number(s.totalPrice) || 0), 0);
 
         const elTotSales = document.getElementById('mgr-panel-total-sales');
         const elTotWholesale = document.getElementById('mgr-panel-total-wholesale');
         const elTotProfit = document.getElementById('mgr-panel-total-profit');
 
-        if (elTotSales) elTotSales.textContent = `${sumSales.toFixed(0)} DH`;
+        if (elTotSales) {
+          elTotSales.innerHTML = inShopValue > 0
+            ? `${sumSales.toFixed(0)} DH <span class="text-[10px] block font-normal text-amber-300">(+ ${inShopValue.toFixed(0)} DH فالمحل)</span>`
+            : `${sumSales.toFixed(0)} DH`;
+        }
         if (elTotWholesale) elTotWholesale.textContent = `${sumWholesale.toFixed(0)} DH`;
         if (elTotProfit) elTotProfit.textContent = `${sumProfit.toFixed(0)} DH`;
 
@@ -4087,24 +4168,39 @@
           const totalW = wUnit * qty;
           const profit = Number(s.totalPrice || 0) - totalW;
           const hasWholesale = wUnit > 0;
+          const isInShop = s.deliveryStatus === 'in_shop';
+
+          const statusBadge = isInShop
+            ? `<span class="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.5 rounded font-black">⏳ مازال فالمحل</span>`
+            : `<span class="bg-emerald-500/30 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded font-bold">✅ خرج وتخلص</span>`;
+
+          const quickDeliverBtn = isInShop
+            ? `<button type="button" data-sale-id="${s.id}"
+                 class="mgr-mark-delivered-btn px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs transition active:scale-95 cursor-pointer shadow-xs flex items-center gap-1 shrink-0"
+                 title="خداه مولاه دابا - يتحسب فالأرباح">
+                 <span>🚀</span> <span>داه مولاه</span>
+               </button>`
+            : '';
 
           return `
-            <div class="p-2.5 rounded-xl bg-slate-800/90 border ${hasWholesale ? 'border-slate-700' : 'border-amber-400/80'} flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-800/90 border ${isInShop ? 'border-amber-400/80 bg-amber-950/20' : (hasWholesale ? 'border-slate-700' : 'border-amber-400/80')} flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap text-xs">
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="px-1.5 py-0.5 rounded bg-slate-700 text-amber-300 text-[10px] font-bold">${catInfo.icon} ${cat}</span>
                   <strong class="text-white font-black text-sm truncate">${s.name}</strong>
                   <span class="bg-blue-900/60 text-blue-300 px-1.5 py-0.2 rounded text-[10px] font-black">${qty}x</span>
+                  ${statusBadge}
                   ${!hasWholesale ? `<span class="bg-amber-400 text-slate-950 text-[10px] px-1.5 py-0.2 rounded font-black badge-pulse">حدد ثمن الجملة</span>` : ''}
                 </div>
                 <div class="text-[11px] text-slate-300 mt-1 flex items-center gap-3 flex-wrap">
                   <span>قيدها: <strong class="text-white">${s.seller}</strong></span>
                   <span>ثمن البيع: <strong class="text-emerald-400">${s.totalPrice} DH</strong> ${qty > 1 ? `(${s.unitPrice}/قطعة)` : ''}</span>
-                  <span>الربح الصافي: <strong class="${profit >= 0 ? 'text-emerald-400' : 'text-red-400'} font-black">${profit.toFixed(0)} DH</strong></span>
+                  <span>الربح: <strong class="${isInShop ? 'text-amber-400' : (profit >= 0 ? 'text-emerald-400' : 'text-red-400')} font-black">${isInShop ? '⏳ (حتى يخرج)' : profit.toFixed(0) + ' DH'}</strong></span>
                 </div>
               </div>
 
               <div class="flex items-center gap-1.5 shrink-0">
+                ${quickDeliverBtn}
                 <div class="flex items-center bg-slate-900 border border-amber-400/60 rounded-xl overflow-hidden">
                   <span class="text-[10px] text-amber-300 px-2 font-bold">الجملة/قطعة:</span>
                   <input type="number" step="any" min="0" value="${wUnit > 0 ? wUnit : ''}" placeholder="مثلا 150"
@@ -4119,6 +4215,23 @@
             </div>
           `;
         }).join('');
+
+        listEl.querySelectorAll('.mgr-mark-delivered-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const saleId = btn.getAttribute('data-sale-id');
+            const targetSale = state.sales.find(s => s.id === saleId);
+            if (targetSale) {
+              targetSale.deliveryStatus = 'delivered';
+              targetSale.deliveredAt = new Date().toISOString();
+              targetSale.deliveredBy = state.activeUser || 'المدير';
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+              playCashSound();
+              showToast(`✅ تم تسليم "${targetSale.name}" وتحسبات فالأرباح دابا! 🎉`);
+              renderAll();
+            }
+          });
+        });
 
         listEl.querySelectorAll('.save-inline-wholesale-btn').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -4338,6 +4451,8 @@
         if (wholesaleInp) wholesaleInp.value = sale.wholesalePrice || getSavedWholesalePrice(sale.name) || 0;
         if (qtyInp) qtyInp.value = sale.qty;
         if (sellerSelect) sellerSelect.value = sale.seller || 'نورالدين';
+        const deliverySelect = document.getElementById('edit-sale-delivery-status');
+        if (deliverySelect) deliverySelect.value = sale.deliveryStatus || 'delivered';
 
         updateEditSaleModalCalculations();
         if (modal) modal.classList.remove('hidden');
@@ -4393,17 +4508,34 @@
       function renderSalesList() {
         const container = document.getElementById('sales-list-container');
         const badgeCount = document.getElementById('sales-badge-count');
+        const inShopCounter = document.getElementById('sales-inshop-counter');
         if (!container) return;
+
+        const totalInShop = state.sales.filter(s => s.deliveryStatus === 'in_shop').length;
+        if (inShopCounter) {
+          inShopCounter.textContent = `${totalInShop} فالمحل ⏳`;
+          if (totalInShop > 0) {
+            inShopCounter.className = 'text-[10px] font-black text-amber-900 bg-amber-200 px-2 py-0.5 rounded-lg border border-amber-300 animate-pulse';
+          } else {
+            inShopCounter.className = 'text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-lg';
+          }
+        }
 
         let listToRender = state.sales;
         if (state.salesCatFilter !== 'all') {
           listToRender = listToRender.filter(s => (s.category || detectStockCategory(s.name)) === state.salesCatFilter);
         }
 
+        if (state.salesDeliveryFilter === 'delivered') {
+          listToRender = listToRender.filter(s => (s.deliveryStatus || 'delivered') !== 'in_shop');
+        } else if (state.salesDeliveryFilter === 'in_shop') {
+          listToRender = listToRender.filter(s => s.deliveryStatus === 'in_shop');
+        }
+
         if (badgeCount) badgeCount.textContent = `${listToRender.length} عملية`;
 
         if (listToRender.length === 0) {
-          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">السجل خاوي فهاد الفرع.</div>`;
+          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">لا توجد عمليات فهاد التصنيف حالياً.</div>`;
           return;
         }
 
@@ -4416,39 +4548,57 @@
           const wUnit = Number(s.wholesalePrice || 0);
           const totalW = wUnit * qty;
           const profit = Number(s.totalPrice || 0) - totalW;
+          const isInShop = s.deliveryStatus === 'in_shop';
+
+          const statusBadge = isInShop
+            ? `<span class="bg-amber-100 text-amber-900 border border-amber-300 font-black text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
+                 <span>⏳</span><span>مازال فالمحل (متخلصاتش)</span>
+               </span>`
+            : `<span class="bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
+                 <span>✅</span><span>خرج وتخلص</span>
+               </span>`;
+
+          const deliverBtn = isInShop ? `
+            <button type="button" class="mark-delivered-btn px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs transition active:scale-95 flex items-center gap-1 cursor-pointer shrink-0"
+              data-id="${s.id}" title="خداه مولاه وخلص - تحسب فالأرباح دابا">
+              <span>🚀</span> <span>داه مولاه (خرج دابا)</span>
+            </button>
+          ` : '';
 
           const priceDisplay = state.isManager
             ? `<div class="text-left">
-                 <span class="font-black text-sm text-emerald-600 block">${s.totalPrice} DH</span>
-                 <span class="text-[10px] ${wUnit > 0 ? 'text-amber-700 font-bold' : 'text-red-500 font-black'} block">
-                   ${wUnit > 0 ? `جملة: ${totalW} | ربح: ${profit} DH` : '⚠️ حدد ثمن الجملة'}
+                 <span class="font-black text-sm ${isInShop ? 'text-amber-800' : 'text-emerald-600'} block">${s.totalPrice} DH</span>
+                 <span class="text-[10px] ${isInShop ? 'text-amber-600 font-bold' : (wUnit > 0 ? 'text-amber-700 font-bold' : 'text-red-500 font-black')} block">
+                   ${isInShop ? '⏳ غير محسوب فالأرباح' : (wUnit > 0 ? `جملة: ${totalW} | ربح: ${profit} DH` : '⚠️ حدد ثمن الجملة')}
                  </span>
                </div>`
             : `<span class="text-xs text-slate-400 font-bold block">🔒 مخفي</span>`;
 
           const editBtnHtml = state.isManager ? `
-            <button type="button" class="edit-sale-btn w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm transition cursor-pointer border border-blue-200"
+            <button type="button" class="edit-sale-btn w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm transition cursor-pointer border border-blue-200 shrink-0"
               data-id="${s.id}" title="تعديل البيع وثمن الجملة (المدير 👑)">✏️</button>
           ` : '';
 
           const deleteBtnHtml = state.isManager ? `
-            <button type="button" class="delete-sale-btn w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-sm transition cursor-pointer"
+            <button type="button" class="delete-sale-btn w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-sm transition cursor-pointer shrink-0"
               data-id="${s.id}" title="مسح هذه العملية">🗑️</button>
           ` : '';
 
           return `
-            <div class="py-2.5 flex items-center justify-between gap-2 text-xs border-b border-slate-100 last:border-0 flex-wrap sm:flex-nowrap">
+            <div class="py-2.5 flex items-center justify-between gap-2 text-xs border-b border-slate-100 last:border-0 flex-wrap sm:flex-nowrap ${isInShop ? 'bg-amber-50/50 p-2 rounded-xl my-1 border border-amber-200/90' : ''}">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded">${catInfo.icon} ${cat}</span>
                   <h4 class="font-extrabold text-slate-800 text-sm truncate">${s.name}</h4>
                   <span class="bg-blue-100 text-blue-800 font-black text-[10px] px-1.5 py-0.5 rounded">${qty > 1 ? qty + 'x' : '1'}</span>
+                  ${statusBadge}
                 </div>
-                <p class="text-[10px] text-slate-400 mt-0.5">باعها: <strong class="text-slate-600 font-bold">${s.seller}</strong> | ${dateStr} - ${timeStr}</p>
+                <p class="text-[10px] text-slate-400 mt-0.5">باعها: <strong class="text-slate-600 font-bold">${s.seller}</strong> | ${dateStr} - ${timeStr} ${s.deliveredAt ? `<span class="text-emerald-700 font-bold">(خرج: ${new Date(s.deliveredAt).toLocaleTimeString('ar-MA', {hour:'2-digit', minute:'2-digit'})})</span>` : ''}</p>
               </div>
 
               <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-end">
-                <button type="button" class="send-to-stock-btn px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-xl text-[11px] font-black transition flex items-center gap-1 cursor-pointer"
+                ${deliverBtn}
+                <button type="button" class="send-to-stock-btn px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-xl text-[11px] font-black transition flex items-center gap-1 cursor-pointer shrink-0"
                   data-id="${s.id}">
                   <span>📦</span> <span>السلعة لي خاصا</span>
                 </button>
@@ -4459,6 +4609,23 @@
             </div>
           `;
         }).join('');
+
+        container.querySelectorAll('.mark-delivered-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const saleId = btn.getAttribute('data-id');
+            const sale = state.sales.find(s => s.id === saleId);
+            if (!sale) return;
+            sale.deliveryStatus = 'delivered';
+            sale.deliveredAt = new Date().toISOString();
+            sale.deliveredBy = state.activeUser || 'المحل';
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+            playCashSound();
+            showToast(`✅ تم خروج "${sale.name}" وتخلصات وتحسبات فالأرباح دابا! 🎉`);
+            renderAll();
+          });
+        });
 
         container.querySelectorAll('.send-to-stock-btn').forEach(btn => {
           btn.addEventListener('click', (e) => {
@@ -4559,6 +4726,33 @@
           });
         }
 
+        // Delivery Status Filter Tabs
+        const tabSalesAll = document.getElementById('tab-sales-filter-all');
+        const tabSalesDelivered = document.getElementById('tab-sales-filter-delivered');
+        const tabSalesInShop = document.getElementById('tab-sales-filter-inshop');
+
+        function setDeliveryFilterTab(val) {
+          state.salesDeliveryFilter = val;
+          const tabs = [
+            { el: tabSalesAll, key: 'all' },
+            { el: tabSalesDelivered, key: 'delivered' },
+            { el: tabSalesInShop, key: 'in_shop' }
+          ];
+          tabs.forEach(t => {
+            if (!t.el) return;
+            if (t.key === val) {
+              t.el.className = 'sales-deliv-tab px-2.5 py-1 rounded-lg bg-white text-slate-900 font-black shadow-xs cursor-pointer';
+            } else {
+              t.el.className = 'sales-deliv-tab px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold cursor-pointer';
+            }
+          });
+          renderSalesList();
+        }
+
+        if (tabSalesAll) tabSalesAll.addEventListener('click', () => setDeliveryFilterTab('all'));
+        if (tabSalesDelivered) tabSalesDelivered.addEventListener('click', () => setDeliveryFilterTab('delivered'));
+        if (tabSalesInShop) tabSalesInShop.addEventListener('click', () => setDeliveryFilterTab('in_shop'));
+
         const filterWholesaleToday = document.getElementById('filter-wholesale-today');
         const filterWholesaleAll = document.getElementById('filter-wholesale-all');
         if (filterWholesaleToday && filterWholesaleAll) {
@@ -4598,6 +4792,8 @@
             const totalPrice = unitPrice * qty;
             const autoWholesale = getSavedWholesalePrice(name);
 
+            const deliveryStatus = document.querySelector('input[name="input-sale-delivery-status"]:checked')?.value || 'delivered';
+
             const newSale = {
               id: 'S-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
               name: name,
@@ -4607,6 +4803,8 @@
               qty: qty,
               totalPrice: totalPrice,
               seller: state.activeUser,
+              deliveryStatus: deliveryStatus,
+              deliveredAt: deliveryStatus === 'delivered' ? new Date().toISOString() : null,
               date: new Date().toISOString()
             };
 
@@ -4614,12 +4812,18 @@
             saveLocalState();
             if (state.syncToCloud) state.syncToCloud();
 
-            playCashSound();
-            showToast(`تم تقييد البيع: "${name}" فـ فرع (${category}) باسم ${state.activeUser}! ✅`);
+            if (deliveryStatus === 'delivered') {
+              playCashSound();
+              showToast(`تم تقييد البيع: "${name}" (خرج وتخلص وتحسب فالأرباح) باسم ${state.activeUser}! ✅`);
+            } else {
+              showToast(`تم تقييد البيع: "${name}" (مازال فالمحل - لن يحسب فالأرباح حتى يخرج) باسم ${state.activeUser}! ⏳`);
+            }
 
             inputName.value = '';
             inputPrice.value = '';
             inputQty.value = '1';
+            const defRadio = document.querySelector('input[name="input-sale-delivery-status"][value="delivered"]');
+            if (defRadio) defRadio.checked = true;
             renderAll();
           });
         }
@@ -4938,6 +5142,7 @@
             const wholesalePrice = Math.max(0, parseFloat(editSaleWholesaleInp?.value || 0));
             const qty = Math.max(1, parseInt(editSaleQtyInp?.value || 1, 10));
             const seller = document.getElementById('edit-sale-seller')?.value || 'نورالدين';
+            const deliveryStatus = document.getElementById('edit-sale-delivery-status')?.value || 'delivered';
             const rememberW = document.getElementById('edit-sale-remember-wholesale')?.checked;
 
             const sale = state.sales.find(s => s.id === saleId);
@@ -4949,6 +5154,10 @@
               sale.qty = qty;
               sale.totalPrice = unitPrice * qty;
               sale.seller = seller;
+              sale.deliveryStatus = deliveryStatus;
+              if (deliveryStatus === 'delivered' && !sale.deliveredAt) {
+                sale.deliveredAt = new Date().toISOString();
+              }
 
               if (rememberW && wholesalePrice > 0) {
                 const normKey = name.toLowerCase();
