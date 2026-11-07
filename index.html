@@ -629,16 +629,44 @@
           </h3>
 
           <form id="supplier-debt-form" class="space-y-3">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Choice: New Supplier/Person vs Existing One -->
+            <div class="bg-amber-50/80 p-2.5 rounded-xl border border-amber-200 flex items-center justify-between gap-3 text-xs flex-wrap">
+              <span class="font-black text-amber-950 flex items-center gap-1">
+                <span>🔘</span> <span>واش باغي تقيد لـ :</span>
+              </span>
+              <div class="flex items-center gap-3 font-bold">
+                <label class="flex items-center gap-1.5 cursor-pointer text-slate-800">
+                  <input type="radio" name="supp_entry_mode" id="supp-mode-new" value="new" checked class="w-4 h-4 accent-amber-600">
+                  <span>زبون / محل جديد ✨</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-slate-800">
+                  <input type="radio" name="supp_entry_mode" id="supp-mode-existing" value="existing" class="w-4 h-4 accent-amber-600">
+                  <span>عزل من اللي مسجلين فـ كيتسالوني 👥</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Existing Supplier Selector (Shown when mode == existing) -->
+            <div id="wrap-supp-existing-select" class="hidden bg-white p-3 rounded-xl border-2 border-amber-400 space-y-1.5">
+              <label class="block text-xs font-black text-amber-900">اختر المحل أو الزبون المسجل مسبقاً فـ كيتسالوني:</label>
+              <select id="select-existing-supp"
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-black text-slate-900 outline-none focus:bg-white focus:border-amber-500">
+                <option value="">-- اضغط هنا لاختيار المحل أو الزبون --</option>
+              </select>
+              <p class="text-[11px] text-slate-500 font-bold">السلعة الجديدة غاتقيد لنفس الحساب وغاتجمع مع الحساب القديم أوتوماتيكياً.</p>
+            </div>
+
+            <!-- New Supplier Inputs (Shown when mode == new) -->
+            <div id="wrap-supp-new-inputs" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">اسم المحل أو المورد:</label>
-                <input type="text" id="debt-supp-name" placeholder="مثلا: محل عبدو للبياس" required
-                  class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 outline-none focus:bg-white">
+                <label class="block text-xs font-bold text-slate-700 mb-1">اسم المحل أو المورد / الزبون:</label>
+                <input type="text" id="debt-supp-name" placeholder="مثلا: محل عبدو للبياس أو كريم..." required
+                  class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 outline-none focus:bg-white focus:border-amber-500">
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف (اختياري):</label>
                 <input type="tel" id="debt-supp-phone" placeholder="06XXXXXXXX"
-                  class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none focus:bg-white">
+                  class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none focus:bg-white focus:border-amber-500">
               </div>
             </div>
 
@@ -736,6 +764,48 @@
           <button type="button" id="btn-cancel-modal-item" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition cursor-pointer">إلغاء</button>
           <button type="submit" id="btn-save-modal-item" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
             <span>💾</span> <span>إضافة للكريدي</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: إضافة سلعة أخرى لمحل/شخص مسجل فـ كيتسالوني ==================== -->
+  <div id="modal-add-item-to-supp-debt" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
+          <span>➕</span> <span>زيادة سلعة/دين لحساب مسجل فـ كيتسالوني</span>
+        </h4>
+        <button type="button" id="btn-close-add-supp-item-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm cursor-pointer">✕</button>
+      </div>
+
+      <p id="modal-target-supp-name" class="text-xs font-black text-amber-900 bg-amber-50 p-2.5 rounded-xl my-3 border border-amber-200">المحل / المورد: --</p>
+
+      <form id="form-modal-add-supp-item" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اشنو خديتي من عندو دابا؟</label>
+          <input type="text" id="modal-new-supp-item-name" placeholder="مثلا: 2 افشورات A12..." required autocomplete="off"
+            class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white focus:border-amber-500 font-bold text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الثمن (DH):</label>
+            <input type="number" id="modal-new-supp-item-total" placeholder="300" min="0" step="any" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-slate-900">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">عطيتيه تسبيق (DH):</label>
+            <input type="number" id="modal-new-supp-item-paid" placeholder="0" min="0" step="any" value="0"
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:bg-white text-center font-black text-emerald-600">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancel-modal-supp-item" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 active:scale-95 transition cursor-pointer">إلغاء</button>
+          <button type="submit" id="btn-save-modal-supp-item" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black shadow-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+            <span>💾</span> <span>إضافة للدين</span>
           </button>
         </div>
       </form>
@@ -1423,6 +1493,9 @@
         activeTargetCustForNewItem: null,
         activeTargetCustId: null,
         activeTargetCustName: null,
+        activeTargetSuppForNewItem: null,
+        activeTargetSuppId: null,
+        activeTargetSuppName: null,
         activePartialTarget: null,
         activeSendToStockSale: null,
         activeEditingSale: null,
@@ -2772,47 +2845,191 @@
         if (formAddItem) formAddItem.addEventListener('submit', handleSaveNewItemToCust);
         if (saveAddItemModal) saveAddItemModal.addEventListener('click', handleSaveNewItemToCust);
 
+        // Radio Toggle for Supplier Mode (New vs Existing)
+        const modeNewRadio = document.getElementById('supp-mode-new');
+        const modeExistingRadio = document.getElementById('supp-mode-existing');
+        const wrapExistingSelect = document.getElementById('wrap-supp-existing-select');
+        const wrapNewInputs = document.getElementById('wrap-supp-new-inputs');
+        const selectExistingSupp = document.getElementById('select-existing-supp');
+
+        function updateSuppModeUI() {
+          const isExisting = modeExistingRadio && modeExistingRadio.checked;
+          if (isExisting) {
+            if (wrapExistingSelect) wrapExistingSelect.classList.remove('hidden');
+            if (wrapNewInputs) wrapNewInputs.classList.add('hidden');
+            if (inputSuppName) inputSuppName.removeAttribute('required');
+            populateExistingSuppliersSelect();
+          } else {
+            if (wrapExistingSelect) wrapExistingSelect.classList.add('hidden');
+            if (wrapNewInputs) wrapNewInputs.classList.remove('hidden');
+            if (inputSuppName) inputSuppName.setAttribute('required', 'required');
+          }
+        }
+
+        if (modeNewRadio) modeNewRadio.addEventListener('change', updateSuppModeUI);
+        if (modeExistingRadio) modeExistingRadio.addEventListener('change', updateSuppModeUI);
+
+        // When existing supplier is chosen from dropdown, pre-fill phone if available
+        if (selectExistingSupp) {
+          selectExistingSupp.addEventListener('change', () => {
+            const suppId = selectExistingSupp.value;
+            const existing = state.debtSuppliers.find(d => d.id === suppId);
+            if (existing && existing.phone && inputSuppPhone) {
+              inputSuppPhone.value = existing.phone;
+            }
+          });
+        }
+
         if (formSupp) {
           formSupp.addEventListener('submit', (e) => {
             e.preventDefault();
-            const name = (inputSuppName.value || '').trim();
-            const phone = (inputSuppPhone.value || '').trim();
-            const items = (inputSuppItems.value || '').trim();
-            const total = Math.max(0, parseFloat(inputSuppTotal.value || 0));
-            const paid = Math.max(0, parseFloat(inputSuppPaid.value || 0));
+            const isExisting = modeExistingRadio && modeExistingRadio.checked;
+            let targetDebt = null;
+            let name = '';
+            let phone = (inputSuppPhone?.value || '').trim();
+
+            if (isExisting) {
+              const selectedId = selectExistingSupp?.value;
+              if (!selectedId) {
+                showToast('يرجى اختيار المحل أو الزبون من القائمة المسجلة!', true);
+                return;
+              }
+              targetDebt = state.debtSuppliers.find(d => d.id === selectedId);
+              if (!targetDebt) {
+                showToast('تعذر العثور على المحل المسجل!', true);
+                return;
+              }
+              name = targetDebt.name;
+              if (!phone && targetDebt.phone) phone = targetDebt.phone;
+            } else {
+              name = (inputSuppName?.value || '').trim();
+              if (!name) {
+                showToast('يرجى كتابة اسم المحل أو الزبون!', true);
+                return;
+              }
+            }
+
+            const items = (inputSuppItems?.value || '').trim();
+            const total = Math.max(0, parseFloat(inputSuppTotal?.value || 0));
+            const paid = Math.max(0, parseFloat(inputSuppPaid?.value || 0));
             const remaining = Math.max(0, total - paid);
 
-            if (!name || !items) {
-              showToast('يرجى كتابة اسم المحل والسلعة!', true);
+            if (!items) {
+              showToast('يرجى كتابة السلعة التي أخذتها!', true);
               return;
             }
 
-            state.debtSuppliers.unshift({
-              id: 'DBT-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
-              name: name,
-              phone: phone,
-              items: items,
-              total: total,
-              paid: paid,
-              remaining: remaining,
-              addedBy: state.activeUser || 'المحل',
-              date: new Date().toISOString(),
-              status: remaining <= 0 ? 'settled' : 'pending'
-            });
+            if (targetDebt) {
+              // Append to existing supplier account
+              targetDebt.items = targetDebt.items ? `${targetDebt.items} + ${items}` : items;
+              targetDebt.total = (Number(targetDebt.total) || 0) + total;
+              targetDebt.paid = (Number(targetDebt.paid) || 0) + paid;
+              targetDebt.remaining = Math.max(0, targetDebt.total - targetDebt.paid);
+              targetDebt.status = targetDebt.remaining <= 0 ? 'settled' : 'pending';
+              if (phone) targetDebt.phone = phone;
+              targetDebt.date = new Date().toISOString();
+              showToast(`تمت إضافة السلعة لحساب "${name}" المسجل بنجاح! 🏪`);
+            } else {
+              // Create new supplier debt
+              state.debtSuppliers.unshift({
+                id: 'DBT-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+                name: name,
+                phone: phone,
+                items: items,
+                total: total,
+                paid: paid,
+                remaining: remaining,
+                addedBy: state.activeUser || 'المحل',
+                date: new Date().toISOString(),
+                status: remaining <= 0 ? 'settled' : 'pending'
+              });
+              showToast(`تم تقييد دين المحل "${name}" بنجاح! 🏪`);
+            }
 
             saveLocalState();
             if (state.syncToCloud) state.syncToCloud();
             playCashSound();
-            showToast(`تم تقييد دين المحل "${name}" بنجاح! 🏪`);
-            inputSuppName.value = '';
-            inputSuppPhone.value = '';
-            inputSuppItems.value = '';
-            inputSuppTotal.value = '';
-            inputSuppPaid.value = '0';
-            inputSuppRem.value = '0 DH';
+
+            if (inputSuppName) inputSuppName.value = '';
+            if (inputSuppPhone) inputSuppPhone.value = '';
+            if (inputSuppItems) inputSuppItems.value = '';
+            if (inputSuppTotal) inputSuppTotal.value = '';
+            if (inputSuppPaid) inputSuppPaid.value = '0';
+            if (inputSuppRem) inputSuppRem.value = '0 DH';
+            if (selectExistingSupp) selectExistingSupp.value = '';
+
+            // reset back to default
+            if (modeNewRadio) modeNewRadio.checked = true;
+            updateSuppModeUI();
+
             renderCreditSection();
           });
         }
+
+        // Add Item to Existing Supplier Modal Handlers
+        const modalAddSuppItem = document.getElementById('modal-add-item-to-supp-debt');
+        const formAddSuppItem = document.getElementById('form-modal-add-supp-item');
+        const closeAddSuppItemModal = document.getElementById('btn-close-add-supp-item-modal');
+        const cancelAddSuppItemModal = document.getElementById('btn-cancel-modal-supp-item');
+        const saveAddSuppItemModal = document.getElementById('btn-save-modal-supp-item');
+
+        function hideAddSuppItemModal() {
+          if (modalAddSuppItem) modalAddSuppItem.classList.add('hidden');
+          state.activeTargetSuppForNewItem = null;
+          state.activeTargetSuppId = null;
+          state.activeTargetSuppName = null;
+        }
+
+        if (closeAddSuppItemModal) closeAddSuppItemModal.addEventListener('click', hideAddSuppItemModal);
+        if (cancelAddSuppItemModal) cancelAddSuppItemModal.addEventListener('click', hideAddSuppItemModal);
+
+        function handleSaveNewItemToSuppDebt(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          try {
+            let debt = null;
+            if (state.activeTargetSuppId) debt = state.debtSuppliers.find(d => d.id === state.activeTargetSuppId);
+            if (!debt && state.activeTargetSuppName) debt = state.debtSuppliers.find(d => d.name && d.name.trim().toLowerCase() === state.activeTargetSuppName.trim().toLowerCase());
+            if (!debt) debt = state.activeTargetSuppForNewItem;
+
+            if (!debt) {
+              showToast('حدث خطأ في تحديد حساب المحل!', true);
+              return;
+            }
+
+            const nameInput = document.getElementById('modal-new-supp-item-name');
+            const totalInput = document.getElementById('modal-new-supp-item-total');
+            const paidInput = document.getElementById('modal-new-supp-item-paid');
+
+            const itemName = (nameInput?.value || '').trim();
+            const itemTotal = Math.max(0, parseFloat(totalInput?.value || 0));
+            const itemPaid = Math.max(0, parseFloat(paidInput?.value || 0));
+
+            if (!itemName) {
+              showToast('يرجى كتابة السلعة التي أخذتها!', true);
+              return;
+            }
+
+            debt.items = debt.items ? `${debt.items} + ${itemName}` : itemName;
+            debt.total = (Number(debt.total) || 0) + itemTotal;
+            debt.paid = (Number(debt.paid) || 0) + itemPaid;
+            debt.remaining = Math.max(0, debt.total - debt.paid);
+            debt.status = debt.remaining <= 0 ? 'settled' : 'pending';
+            debt.date = new Date().toISOString();
+
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+
+            hideAddSuppItemModal();
+            playCashSound();
+            showToast(`تمت إضافة "${itemName}" لحساب "${debt.name}" بنجاح! 🏪`);
+            renderCreditSection();
+          } catch (err) {
+            showToast('حدث خطأ أثناء الإضافة', true);
+          }
+        }
+
+        if (formAddSuppItem) formAddSuppItem.addEventListener('submit', handleSaveNewItemToSuppDebt);
+        if (saveAddSuppItemModal) saveAddSuppItemModal.addEventListener('click', handleSaveNewItemToSuppDebt);
 
         if (cancelPartial) cancelPartial.addEventListener('click', () => modalPartial.classList.add('hidden'));
         if (confirmPartial) {
@@ -2870,6 +3087,54 @@
         if (paidInp) paidInp.value = '0';
 
         if (modal) modal.classList.remove('hidden');
+        if (nameInp) setTimeout(() => nameInp.focus(), 150);
+      }
+
+            function populateExistingSuppliersSelect() {
+        const select = document.getElementById("select-existing-supp");
+        if (!select) return;
+        const currentVal = select.value;
+        select.innerHTML = `<option value="">-- اضغط هنا لاختيار المحل أو الزبون المسجل --</option>`;
+
+        // Get unique suppliers by name or id
+        const map = new Map();
+        state.debtSuppliers.forEach(d => {
+          const key = (d.name || "").trim().toLowerCase();
+          if (key && !map.has(key)) {
+            map.set(key, d);
+          }
+        });
+
+        Array.from(map.values()).forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d.id;
+          opt.textContent = `${d.name} (الباقي كيتسالنا: ${d.remaining || 0} DH)`;
+          select.appendChild(opt);
+        });
+
+        if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
+          select.value = currentVal;
+        }
+      }
+
+      function openAddSuppItemModal(debt) {
+        if (!debt) return;
+        state.activeTargetSuppForNewItem = debt;
+        state.activeTargetSuppId = debt.id;
+        state.activeTargetSuppName = debt.name;
+
+        const modal = document.getElementById("modal-add-item-to-supp-debt");
+        const suppNameEl = document.getElementById("modal-target-supp-name");
+        const nameInp = document.getElementById("modal-new-supp-item-name");
+        const totInp = document.getElementById("modal-new-supp-item-total");
+        const paidInp = document.getElementById("modal-new-supp-item-paid");
+
+        if (suppNameEl) suppNameEl.textContent = `المحل أو المورد: ${debt.name}`;
+        if (nameInp) nameInp.value = "";
+        if (totInp) totInp.value = "";
+        if (paidInp) paidInp.value = "0";
+
+        if (modal) modal.classList.remove("hidden");
         if (nameInp) setTimeout(() => nameInp.focus(), 150);
       }
 
@@ -3182,6 +3447,8 @@
       }
 
       function renderSuppliersDebtList() {
+        populateExistingSuppliersSelect();
+
         const container = document.getElementById('suppliers-debt-list');
         if (!container) return;
 
@@ -3191,47 +3458,80 @@
         });
 
         if (filtered.length === 0) {
-          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">ما كاين حتى دين حالياً.</div>`;
+          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">ما كاين حتى دين مسجل فهاد الفرع.</div>`;
           return;
         }
 
         container.innerHTML = filtered.map(item => {
           const isSettled = item.status === 'settled';
           const dateStr = new Date(item.date).toLocaleDateString('ar-MA', { day: 'numeric', month: 'short' });
+          const hasPhone = item.phone && item.phone.trim() !== '';
+
           const deleteBtn = state.isManager ? `
             <button type="button" class="delete-suppdebt-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-xs cursor-pointer"
-              data-id="${item.id}">✕</button>
+              data-id="${item.id}" title="حذف هذا الدين">✕</button>
           ` : '';
 
           return `
-            <div class="py-3 px-2 flex items-center justify-between gap-2 text-xs ${isSettled ? 'opacity-60' : ''}">
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <h4 class="font-extrabold text-slate-900 text-sm truncate">${item.name}</h4>
-                  <span class="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-md font-bold">خديت: ${item.items}</span>
+            <div class="py-3 px-3 rounded-xl border border-slate-200 bg-white space-y-2 text-xs ${isSettled ? 'opacity-60 bg-slate-50/50' : ''}">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h4 class="font-black text-slate-900 text-sm truncate">🏪 ${item.name}</h4>
+                    ${hasPhone ? `<span class="bg-slate-100 text-slate-700 font-mono text-[11px] px-1.5 py-0.2 rounded font-bold">📱 ${item.phone}</span>` : ''}
+                    ${isSettled ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black">خالص ومردود ✓</span>` : ''}
+                  </div>
+                  <div class="text-[11px] text-slate-600 mt-1 font-bold">
+                    <span>📦 السلع المأخوذة:</span>
+                    <span class="text-amber-950 font-black">${item.items}</span>
+                  </div>
                 </div>
-                <div class="flex items-center gap-3 text-[11px] text-slate-500 mt-1 flex-wrap">
-                  <span>المجموع: <strong>${item.total} DH</strong></span>
-                  <span>عطيتو: <strong class="text-emerald-600">${item.paid} DH</strong></span>
-                  <span>باقي كيتسالني: <strong class="text-amber-700 font-black text-sm">${item.remaining} DH</strong></span>
-                  <span class="text-slate-400">قيده: ${item.addedBy} (${dateStr})</span>
+
+                <div class="text-left bg-amber-50/70 p-2 rounded-xl border border-amber-200">
+                  <div class="text-[11px] text-slate-500 font-bold">المجموع: ${item.total} DH | عطيتو: <span class="text-emerald-700">${item.paid} DH</span></div>
+                  <div class="text-sm font-black text-amber-800">باقي كيتسالنا: <span class="text-base">${item.remaining} DH</span></div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-1.5 flex-wrap">
-                ${!isSettled ? (state.isManager ? `
-                  <button type="button" class="partial-suppdebt-btn px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg text-xs font-bold cursor-pointer"
-                    data-id="${item.id}">💵 دفعت جزء</button>
-                  <button type="button" class="settle-suppdebt-btn px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black cursor-pointer"
-                    data-id="${item.id}">✅ رديت كولشي</button>
-                ` : `
-                  <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded">🔒 الدفع للمدير فقط</span>
-                `) : `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black">خالص ✓</span>`}
-                ${deleteBtn}
+              <div class="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <!-- Add another item to this supplier -->
+                  <button type="button" class="add-item-to-supp-btn px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-black border border-amber-300 flex items-center gap-1 cursor-pointer transition active:scale-95"
+                    data-id="${item.id}" data-name="${encodeURIComponent(item.name)}">
+                    <span>➕</span> <span>زيد سلعة أخرى لنفس الحساب</span>
+                  </button>
+                  <span class="text-[10px] text-slate-400">قيده: <strong>${item.addedBy}</strong> (${dateStr})</span>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  ${!isSettled ? (state.isManager ? `
+                    <button type="button" class="partial-suppdebt-btn px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-lg text-xs font-black transition cursor-pointer"
+                      data-id="${item.id}">💵 دفعت جزء</button>
+                    <button type="button" class="settle-suppdebt-btn px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black cursor-pointer"
+                      data-id="${item.id}">✅ رديت كولشي</button>
+                  ` : `
+                    <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded">🔒 الدفع للمدير فقط</span>
+                  `) : ''}
+                  ${deleteBtn}
+                </div>
               </div>
             </div>
           `;
         }).join('');
+
+        container.querySelectorAll('.add-item-to-supp-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const suppId = btn.getAttribute('data-id');
+            const suppNameRaw = btn.getAttribute('data-name');
+            const suppName = suppNameRaw ? decodeURIComponent(suppNameRaw) : '';
+            const debt = state.debtSuppliers.find(d => d.id === suppId)
+                      || state.debtSuppliers.find(d => d.name && d.name.trim().toLowerCase() === suppName.trim().toLowerCase());
+            if (debt) {
+              openAddSuppItemModal(debt);
+            }
+          });
+        });
 
         container.querySelectorAll('.settle-suppdebt-btn').forEach(btn => {
           btn.addEventListener('click', () => {
