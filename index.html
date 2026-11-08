@@ -356,10 +356,20 @@
               <span>📊</span>
               <span>مجموع السلع المباعة حسب الفرع</span>
             </h3>
-            <div class="flex bg-slate-100 p-0.5 rounded-lg text-[10px]">
+            <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] gap-0.5 flex-wrap">
               <button type="button" id="filter-totals-all" class="totals-filter-btn px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs font-bold cursor-pointer">الكل</button>
               <button type="button" id="filter-totals-today" class="totals-filter-btn px-2 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold cursor-pointer">اليوم</button>
+              <button type="button" id="filter-totals-yesterday" class="totals-filter-btn px-2 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold cursor-pointer">البارح</button>
+              <div id="filter-totals-date-wrapper" class="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-slate-600 hover:text-slate-900 font-bold cursor-pointer bg-transparent transition">
+                <span title="عزل نهار">📅</span>
+                <input type="date" id="input-totals-date" class="text-[10px] bg-transparent border-0 font-bold text-slate-800 outline-none cursor-pointer max-w-[100px]" title="عزل اليوم اللي باغي">
+              </div>
             </div>
+          </div>
+
+          <!-- Selected Date Financial Summary Banner (جديد: شحال دخلت وتفاصيل النهار المختار) -->
+          <div id="date-financial-summary-banner" class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl p-3 text-xs shadow-xs space-y-2">
+            <!-- Populated by JS -->
           </div>
 
           <!-- Category Filter Bar for Sales -->
@@ -1567,6 +1577,7 @@
         lastUpdated: 0,
         roomCode: 'iliktronds_shop_permanent_cloud_v1',
         totalsFilter: 'all',
+        customDate: null,
         salesCatFilter: 'all',
         salesDeliveryFilter: 'all', // 'all', 'delivered', 'in_shop' 
         wholesaleFilter: 'today',
@@ -4274,14 +4285,131 @@
         });
       }
 
+
+      // Date Filter Helpers for Daily Breakdown
+      function getSaleDateYMD(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+
+      function getTodayYMD() {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+
+      function getYesterdayYMD() {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+
+      function filterSalesByDate(sales, filterType, customDate) {
+        if (!Array.isArray(sales)) return [];
+        if (filterType === 'today') {
+          const todayYMD = getTodayYMD();
+          return sales.filter(s => getSaleDateYMD(s.date) === todayYMD);
+        }
+        if (filterType === 'yesterday') {
+          const yestYMD = getYesterdayYMD();
+          return sales.filter(s => getSaleDateYMD(s.date) === yestYMD);
+        }
+        if (filterType === 'custom' && customDate) {
+          return sales.filter(s => getSaleDateYMD(s.date) === customDate);
+        }
+        return sales;
+      }
+
+      function renderDateFinancialSummaryBanner(targetSales, filterType, customDate) {
+        const banner = document.getElementById('date-financial-summary-banner');
+        if (!banner) return;
+
+        let title = 'كاع المبيعات المسجلة';
+        if (filterType === 'today') {
+          title = 'مبيعات اليوم (' + new Date().toLocaleDateString('ar-MA', { weekday: 'long', day: 'numeric', month: 'short' }) + ')';
+        } else if (filterType === 'yesterday') {
+          const y = new Date();
+          y.setDate(y.getDate() - 1);
+          title = 'مبيعات البارح (' + y.toLocaleDateString('ar-MA', { weekday: 'long', day: 'numeric', month: 'short' }) + ')';
+        } else if (filterType === 'custom' && customDate) {
+          const parts = customDate.split('-');
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          title = 'مبيعات نهار (' + d.toLocaleDateString('ar-MA', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }) + ')';
+        }
+
+        const deliveredSales = targetSales.filter(s => (s.deliveryStatus || 'delivered') !== 'in_shop');
+        const inShopSales = targetSales.filter(s => s.deliveryStatus === 'in_shop');
+
+        const totalDeliveredQty = deliveredSales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
+        const totalInShopQty = inShopSales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
+        const totalQty = totalDeliveredQty + totalInShopQty;
+
+        const totalRev = deliveredSales.reduce((acc, s) => acc + (Number(s.totalPrice) || 0), 0);
+        const totalWholesale = deliveredSales.reduce((acc, s) => {
+          const w = Number(s.wholesalePrice || 0);
+          return acc + (w * (Number(s.qty) || 1));
+        }, 0);
+        const netProfit = totalRev - totalWholesale;
+        const inShopValue = inShopSales.reduce((acc, s) => acc + (Number(s.totalPrice) || 0), 0);
+
+        if (state.isManager) {
+          banner.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-1.5 flex-wrap gap-1">
+              <span class="font-black text-amber-400 text-xs flex items-center gap-1.5">
+                <span>📅</span> <span>${title}</span>
+              </span>
+              <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-lg border border-slate-700 font-bold">
+                ${totalQty} قطع (${targetSales.length} عملية)
+              </span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center pt-0.5">
+              <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+                <span class="text-[10px] text-slate-400 font-bold block">مداخيل البيع 💰</span>
+                <span class="text-sm font-black text-emerald-400 block">${totalRev.toFixed(0)} DH</span>
+                ${inShopValue > 0 ? `<span class="text-[9px] text-amber-400 font-bold block mt-0.5">+ ${inShopValue.toFixed(0)} DH فالمحل</span>` : ''}
+              </div>
+              <div class="bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+                <span class="text-[10px] text-slate-400 font-bold block">تكلفة الجملة 📦</span>
+                <span class="text-sm font-black text-amber-400 block">${totalWholesale.toFixed(0)} DH</span>
+                <span class="text-[9px] text-slate-400 font-semibold block mt-0.5">رأس المال</span>
+              </div>
+              <div class="bg-slate-800/80 p-2 rounded-xl border border-emerald-500/40 bg-emerald-950/20">
+                <span class="text-[10px] text-emerald-300 font-bold block">الربح الصافي 📈</span>
+                <span class="text-sm font-black ${netProfit >= 0 ? 'text-emerald-400' : 'text-red-400'} block">${netProfit.toFixed(0)} DH</span>
+                <span class="text-[9px] text-emerald-400/80 font-semibold block mt-0.5">${totalDeliveredQty} قطع خرجات</span>
+              </div>
+            </div>
+          `;
+        } else {
+          banner.innerHTML = `
+            <div class="flex items-center justify-between flex-wrap gap-1">
+              <span class="font-black text-amber-400 text-xs flex items-center gap-1.5">
+                <span>📅</span> <span>${title}</span>
+              </span>
+              <span class="text-[11px] bg-slate-800 text-slate-200 px-2.5 py-1 rounded-lg font-bold">
+                تباعو: <strong class="text-white font-black">${totalQty}</strong> قطع (${targetSales.length} عملية)
+              </span>
+            </div>
+            <p class="text-[10px] text-slate-400 text-center font-bold">🔒 تفاصيل الأرباح والمداخيل النقدية خاصة بالمدير (نورالدين)</p>
+          `;
+        }
+      }
+
       function renderSalesCategoryFilterBar() {
         const bar = document.getElementById('sales-category-filter-bar');
         if (!bar) return;
 
-        const todayStr = new Date().toDateString();
-        const baseList = state.totalsFilter === 'today'
-          ? state.sales.filter(s => new Date(s.date).toDateString() === todayStr)
-          : state.sales;
+        const baseList = filterSalesByDate(state.sales, state.totalsFilter, state.customDate);
 
         const counts = {};
         let totalQty = 0;
@@ -4329,21 +4457,19 @@
       }
 
       function renderAggregatedItems() {
+        const baseList = filterSalesByDate(state.sales, state.totalsFilter, state.customDate);
+        renderDateFinancialSummaryBanner(baseList, state.totalsFilter, state.customDate);
         renderSalesCategoryFilterBar();
         const container = document.getElementById('aggregated-items-container');
         if (!container) return;
 
-        const todayStr = new Date().toDateString();
-        let filteredSales = state.totalsFilter === 'today'
-          ? state.sales.filter(s => new Date(s.date).toDateString() === todayStr)
-          : state.sales;
-
+        let filteredSales = baseList;
         if (state.salesCatFilter !== 'all') {
           filteredSales = filteredSales.filter(s => (s.category || detectStockCategory(s.name)) === state.salesCatFilter);
         }
 
         if (filteredSales.length === 0) {
-          container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">لا توجد مبيعات فهاد الفرع.</div>`;
+          container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-bold">لا توجد مبيعات مسجلة فهاد التاريخ أو الفرع.</div>`;
           return;
         }
 
@@ -4357,13 +4483,20 @@
               category: cat,
               totalQty: 0,
               totalMoney: 0,
-              totalWholesale: 0
+              totalWholesale: 0,
+              deliveredQty: 0,
+              inShopQty: 0
             };
           }
           const q = Number(s.qty || 1);
           groups[key].totalQty += q;
-          groups[key].totalMoney += Number(s.totalPrice || 0);
-          groups[key].totalWholesale += (Number(s.wholesalePrice || 0) * q);
+          if (s.deliveryStatus === 'in_shop') {
+            groups[key].inShopQty += q;
+          } else {
+            groups[key].deliveredQty += q;
+            groups[key].totalMoney += Number(s.totalPrice || 0);
+            groups[key].totalWholesale += (Number(s.wholesalePrice || 0) * q);
+          }
         });
 
         const sortedGroups = Object.values(groups).sort((a, b) => b.totalQty - a.totalQty);
@@ -4376,13 +4509,14 @@
                  <span>البيع: <strong class="text-emerald-700">${g.totalMoney} DH</strong></span>
                  <span>الجملة: <strong class="text-amber-700">${g.totalWholesale} DH</strong></span>
                  <span>الربح: <strong class="text-blue-700">${profit} DH</strong></span>
+                 ${g.inShopQty > 0 ? `<span class="text-amber-700 font-bold bg-amber-50 px-1 rounded">(${g.inShopQty} فالمحل)</span>` : ''}
                </div>`
             : `<p class="text-[11px] text-slate-400 font-bold">🔒 المداخيل خاصة بالمدير</p>`;
 
           return `
             <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
               <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="text-[10px] bg-white px-1.5 py-0.5 rounded border border-slate-200 font-bold">${catInfo.icon} ${g.category}</span>
                   <h4 class="font-extrabold text-sm text-slate-800 truncate">${g.name}</h4>
                 </div>
@@ -4521,7 +4655,8 @@
           }
         }
 
-        let listToRender = state.sales;
+        let listToRender = filterSalesByDate(state.sales, state.totalsFilter, state.customDate);
+
         if (state.salesCatFilter !== 'all') {
           listToRender = listToRender.filter(s => (s.category || detectStockCategory(s.name)) === state.salesCatFilter);
         }
@@ -4711,18 +4846,46 @@
 
         const filterAllBtn = document.getElementById('filter-totals-all');
         const filterTodayBtn = document.getElementById('filter-totals-today');
-        if (filterAllBtn && filterTodayBtn) {
-          filterAllBtn.addEventListener('click', () => {
-            state.totalsFilter = 'all';
-            filterAllBtn.className = 'totals-filter-btn px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs font-bold cursor-pointer';
-            filterTodayBtn.className = 'totals-filter-btn px-2 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold cursor-pointer';
-            renderAggregatedItems();
-          });
-          filterTodayBtn.addEventListener('click', () => {
-            state.totalsFilter = 'today';
-            filterTodayBtn.className = 'totals-filter-btn px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs font-bold cursor-pointer';
-            filterAllBtn.className = 'totals-filter-btn px-2 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold cursor-pointer';
-            renderAggregatedItems();
+        const filterYestBtn = document.getElementById('filter-totals-yesterday');
+        const dateWrapper = document.getElementById('filter-totals-date-wrapper');
+        const inputTotalsDate = document.getElementById('input-totals-date');
+
+        function setDateFilter(filterType, customDate = null) {
+          state.totalsFilter = filterType;
+          state.customDate = customDate;
+
+          const inactiveClass = 'totals-filter-btn px-2 py-1 rounded-md text-slate-500 hover:text-slate-900 font-bold cursor-pointer';
+          const activeClass = 'totals-filter-btn px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs font-black cursor-pointer';
+
+          if (filterAllBtn) filterAllBtn.className = filterType === 'all' ? activeClass : inactiveClass;
+          if (filterTodayBtn) filterTodayBtn.className = filterType === 'today' ? activeClass : inactiveClass;
+          if (filterYestBtn) filterYestBtn.className = filterType === 'yesterday' ? activeClass : inactiveClass;
+
+          if (dateWrapper) {
+            if (filterType === 'custom') {
+              dateWrapper.className = 'flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white text-slate-900 shadow-xs font-black cursor-pointer border border-emerald-400';
+            } else {
+              dateWrapper.className = 'flex items-center gap-1 px-1.5 py-0.5 rounded-md text-slate-500 hover:text-slate-900 font-bold cursor-pointer bg-transparent transition';
+            }
+          }
+
+          if (filterType !== 'custom' && inputTotalsDate) {
+            inputTotalsDate.value = '';
+          }
+
+          renderAggregatedItems();
+          renderSalesList();
+        }
+
+        if (filterAllBtn) filterAllBtn.addEventListener('click', () => setDateFilter('all'));
+        if (filterTodayBtn) filterTodayBtn.addEventListener('click', () => setDateFilter('today'));
+        if (filterYestBtn) filterYestBtn.addEventListener('click', () => setDateFilter('yesterday'));
+
+        if (inputTotalsDate) {
+          inputTotalsDate.addEventListener('change', () => {
+            if (inputTotalsDate.value) {
+              setDateFilter('custom', inputTotalsDate.value);
+            }
           });
         }
 
@@ -5294,5 +5457,4 @@
     })();
   </script>
 </body>
-</html>
-```
+  </html>
