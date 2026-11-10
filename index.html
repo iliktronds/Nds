@@ -128,17 +128,17 @@
         </div>
       </div>
 
-      <!-- Row 3: 3 Main Navigation Tabs -->
-      <div class="grid grid-cols-3 gap-1.5 text-xs font-black pt-0.5">
+      <!-- Row 3: 4 Main Navigation Tabs (المبيعات - السلعة لي خاصا - إدارة الكريدي - المخزون والسلعة) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-black pt-0.5">
         <button type="button" id="nav-btn-sales"
           class="page-nav-btn active py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1 shadow-sm transition cursor-pointer">
           <span>💰</span>
-          <span>تسجيل المبيعات</span>
+          <span>المبيعات</span>
         </button>
 
         <button type="button" id="nav-btn-stock"
           class="page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition cursor-pointer">
-          <span>📦</span>
+          <span>📋</span>
           <span>السلعة لي خاصا</span>
           <span id="badge-needed-stock-count" class="bg-amber-400 text-slate-950 text-[10px] px-1.5 rounded-full font-black">0</span>
         </button>
@@ -148,6 +148,13 @@
           <span>💳</span>
           <span>إدارة الكريدي</span>
           <span id="badge-credit-count" class="bg-rose-500 text-white text-[10px] px-1.5 rounded-full font-black">0</span>
+        </button>
+
+        <button type="button" id="nav-btn-inventory"
+          class="page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition cursor-pointer">
+          <span>📦</span>
+          <span>المخزون والسلعة</span>
+          <span id="badge-inventory-count" class="bg-blue-500 text-white text-[10px] px-1.5 rounded-full font-black">0</span>
         </button>
       </div>
 
@@ -801,6 +808,174 @@
 
     </div>
 
+    <!-- ==================== PAGE 4: إدارة المخزون المتوفر (Stock) ==================== -->
+    <div id="view-inventory-page" class="hidden space-y-4">
+
+      <!-- Inventory KPIs -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
+          <span class="text-[11px] text-slate-500 font-bold block">مجموع السلع فالمخزون</span>
+          <div class="flex items-baseline gap-1 mt-1">
+            <span id="kpi-inventory-total-items" class="text-xl sm:text-2xl font-black text-blue-600">0</span>
+            <span class="text-xs font-bold text-slate-400">قطعة</span>
+          </div>
+          <span id="kpi-inventory-types-count" class="text-[10px] text-slate-400 block mt-0.5">0 نوع / موديل مسجل</span>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl border border-amber-200 shadow-xs bg-amber-50/30">
+          <span class="text-[11px] text-amber-800 font-bold block">رأس المال فالمخزون 📦</span>
+          <div class="mt-1">
+            <span id="kpi-inventory-total-cost" class="text-xl sm:text-2xl font-black text-amber-600">🔒 للمدير</span>
+          </div>
+          <span class="text-[10px] text-amber-700 font-bold block mt-0.5">مجموع ثمن الشراء بالجملة</span>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl border border-blue-200 shadow-xs bg-blue-50/30">
+          <span class="text-[11px] text-blue-800 font-bold block">قيمة البيع المتوقعة 💰</span>
+          <div class="mt-1">
+            <span id="kpi-inventory-total-sell" class="text-xl sm:text-2xl font-black text-blue-700">🔒 للمدير</span>
+          </div>
+          <span class="text-[10px] text-blue-600 font-bold block mt-0.5">المدخول عند بيع المخزون</span>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl border border-emerald-300 shadow-xs bg-emerald-50/40">
+          <span class="text-[11px] text-emerald-900 font-bold block">الربح الصافي المتوقع 📈</span>
+          <div class="mt-1">
+            <span id="kpi-inventory-total-profit" class="text-xl sm:text-2xl font-black text-emerald-700">🔒 للمدير</span>
+          </div>
+          <span class="text-[10px] text-emerald-700 font-bold block mt-0.5">البيع ناقص الشراء</span>
+        </div>
+      </div>
+
+      <!-- Form: Add New Inventory Item -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <h2 class="font-black text-sm sm:text-base text-slate-900 flex items-center gap-1.5">
+            <span>📥</span>
+            <span>تقييد سلعة جديدة دخلات للمخزون (شريتها)</span>
+          </h2>
+          <span class="text-xs font-bold bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full border border-blue-200">
+            الفرع المختار: <strong id="label-active-inventory-cat">افشور</strong>
+          </span>
+        </div>
+
+        <form id="form-add-inventory" class="space-y-3">
+          <!-- Category selection -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">فرع السلعة (باش تقيد فبلاصتها):</label>
+            <select id="input-inventory-category" required
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-black text-slate-900 outline-none focus:bg-white focus:border-blue-500">
+              <option value="افشور">📱 افشور (شاشات وافشورات)</option>
+              <option value="باتري">🔋 باتري (بطاريات)</option>
+              <option value="5D">🛡️ 5D (زجاج 5D / 9D Incassable)</option>
+              <option value="زاج عادي">🔲 زاج عادي (حماية عادي)</option>
+              <option value="بوشيط">💼 بوشيط (أغطية وبوشيطات)</option>
+              <option value="شارجورات">🔌 شارجورات (شواحن وكابلات)</option>
+              <option value="اكسسوارات">🎧 اكسسوارات (سماعات وإكسسوار)</option>
+              <option value="هواتف">📲 هواتف (هواتف ذكية)</option>
+              <option value="اصلاح الهاتف">🔧 اصلاح الهاتف (قطع غيار وكونيكتور)</option>
+            </select>
+
+            <div id="inv-form-cat-quick-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2 pb-0.5">
+              <button type="button" data-cat="افشور" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-600 text-white shadow-xs shrink-0 cursor-pointer">📱 افشور</button>
+              <button type="button" data-cat="باتري" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">🔋 باتري</button>
+              <button type="button" data-cat="5D" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">🛡️ 5D</button>
+              <button type="button" data-cat="زاج عادي" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">🔲 زاج عادي</button>
+              <button type="button" data-cat="بوشيط" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">💼 بوشيط</button>
+              <button type="button" data-cat="شارجورات" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">🔌 شارجورات</button>
+              <button type="button" data-cat="اكسسوارات" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">🎧 اكسسوارات</button>
+              <button type="button" data-cat="هواتف" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">📲 هواتف</button>
+              <button type="button" data-cat="اصلاح الهاتف" class="inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer">🔧 اصلاح الهاتف</button>
+            </div>
+          </div>
+
+          <!-- Item Name, Qty, Buy Price, Sell Price -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <div class="sm:col-span-5">
+              <label class="block text-xs font-bold text-slate-700 mb-1">اسم السلعة / الموديل (مثلا: افشور Samsung A12):</label>
+              <input type="text" id="input-inv-name" placeholder="اكتب اسم السلعة..." required autocomplete="off"
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-500 outline-none">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 mb-1">الكمية:</label>
+              <div class="flex items-center bg-slate-50 border border-slate-300 rounded-xl overflow-hidden">
+                <button type="button" id="btn-dec-inv-qty" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 font-black text-xs cursor-pointer">-</button>
+                <input type="number" id="input-inv-qty" value="1" min="1" required
+                  class="w-full p-1.5 bg-transparent text-center text-xs font-black outline-none">
+                <button type="button" id="btn-inc-inv-qty" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 font-black text-xs cursor-pointer">+</button>
+              </div>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-amber-800 mb-1">ثمن الشراء (DH) 👑:</label>
+              <input type="number" id="input-inv-buy-price" placeholder="150" min="0" step="any"
+                class="w-full p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-center text-xs font-black text-amber-900 focus:bg-white focus:border-amber-500 outline-none" title="يظهر للمدير فقط">
+            </div>
+
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-emerald-800 mb-1">ثمن البيع للكليان (DH) 👥:</label>
+              <input type="number" id="input-inv-sell-price" placeholder="230" min="0" step="any" required
+                class="w-full p-2.5 bg-emerald-50 border border-emerald-300 rounded-xl text-center text-xs font-black text-emerald-700 focus:bg-white focus:border-emerald-500 outline-none" title="يظهر للموظفين والمدير">
+            </div>
+          </div>
+
+          <!-- Supplier & Location Notes -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            <div>
+              <label class="block font-bold text-slate-600 mb-1">المورد / من عند من شريتها (اختياري):</label>
+              <input type="text" id="input-inv-supplier" placeholder="مثلا: محل عبده لليبياس، درب غلف..."
+                class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:bg-white">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-600 mb-1">ملاحظة أو مكان التخزين (اختياري):</label>
+              <input type="text" id="input-inv-notes" placeholder="مثلا: فالمجر، فالفيترينة الفوق..."
+                class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:bg-white">
+            </div>
+          </div>
+
+          <button type="submit"
+            class="w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-black rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>📥</span>
+            <span>حفظ وتقييد السلعة فالمخزون المتوفر</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Inventory Search & Category Filter Section -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <h3 class="font-black text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
+              <span>📋</span>
+              <span>لائحة السلع المتوفرة فالمخزون</span>
+            </h3>
+            <span id="inv-items-badge-count" class="text-[11px] font-black bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full">0 سلعة</span>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex items-center gap-1.5 flex-1 max-w-xs justify-end">
+            <div class="relative w-full">
+              <input type="text" id="input-search-inventory" placeholder="🔍 بحث باسم السلعة أو الموديل..."
+                class="w-full py-1.5 pr-2 pl-6 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:bg-white focus:border-blue-400">
+              <button type="button" id="btn-clear-inv-search" class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs hidden cursor-pointer">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Filter Pills Bar for Inventory -->
+        <div id="inventory-category-filter-bar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-[11px]">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Inventory Cards List -->
+        <div id="inventory-items-container" class="divide-y divide-slate-100 max-h-[500px] overflow-y-auto space-y-1">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+    </div>
+
   </main>
 
   <!-- ==================== MODAL: إضافة سلعة أخرى لزبون موجود ==================== -->
@@ -1170,6 +1345,67 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL: تعديل سلعة فالمخزون ==================== -->
+  <div id="modal-edit-inventory" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
+          <span>✏️</span> <span>تعديل سلعة المخزون</span>
+        </h4>
+        <button type="button" id="btn-close-edit-inv-modal" class="text-slate-400 hover:text-slate-600 font-bold text-sm cursor-pointer">✕</button>
+      </div>
+
+      <form id="form-edit-inventory" class="space-y-2.5 text-xs mt-3">
+        <input type="hidden" id="edit-inv-id">
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">الفرع:</label>
+          <select id="edit-inv-category" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl outline-none font-bold text-slate-800">
+            <option value="افشور">📱 افشور</option>
+            <option value="باتري">🔋 باتري</option>
+            <option value="5D">🛡️ 5D</option>
+            <option value="زاج عادي">🔲 زاج عادي</option>
+            <option value="بوشيط">💼 بوشيط</option>
+            <option value="شارجورات">🔌 شارجورات</option>
+            <option value="اكسسوارات">🎧 اكسسوارات</option>
+            <option value="هواتف">📲 هواتف</option>
+            <option value="اصلاح الهاتف">🔧 اصلاح الهاتف</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">اسم السلعة / الموديل:</label>
+          <input type="text" id="edit-inv-name" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl outline-none font-bold text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">الكمية:</label>
+            <input type="number" id="edit-inv-qty" min="0" step="1" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-center font-black text-blue-600">
+          </div>
+          <div>
+            <label class="block text-amber-800 font-black mb-1">ثمن الشراء 👑:</label>
+            <input type="number" id="edit-inv-buy-price" min="0" step="any" class="w-full p-2 bg-amber-50 border border-amber-300 rounded-xl text-center font-black text-amber-900">
+          </div>
+          <div>
+            <label class="block text-emerald-800 font-black mb-1">ثمن البيع 👥:</label>
+            <input type="number" id="edit-inv-sell-price" min="0" step="any" required class="w-full p-2 bg-emerald-50 border border-emerald-300 rounded-xl text-center font-black text-emerald-700">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">المورد (اختياري):</label>
+          <input type="text" id="edit-inv-supplier" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl outline-none font-bold text-slate-800">
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" id="btn-cancel-edit-inv" class="px-3 py-2 bg-slate-100 rounded-xl font-bold text-slate-600 cursor-pointer">إلغاء</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black shadow-xs cursor-pointer">حفظ التعديل ✅</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ==================== MODAL: تعديل سلعة الكريدي (خاص بالمدير) ==================== -->
   <div id="modal-edit-credit-item" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-right">
@@ -1520,6 +1756,7 @@
       const STORAGE_KEYS = {
         SALES: 'electro_permanent_sales_db',
         STOCK_NEEDS: 'electro_permanent_stock_db',
+        INVENTORY: 'electro_permanent_inventory_db',
         CREDIT_CUSTOMERS: 'electro_permanent_credit_cust_db',
         DEBT_SUPPLIERS: 'electro_permanent_debt_supp_db',
         PRESETS: 'electro_permanent_presets_db',
@@ -1562,6 +1799,17 @@
         'اصلاح الهاتف': { name: 'قطع غيار وإصلاح الهاتف', icon: '🔧', color: 'rose' }
       };
 
+      const DEFAULT_INVENTORY = [
+        { id: 'INV-1', name: 'افشور Samsung A12', category: 'افشور', qty: 4, buyPrice: 150, sellPrice: 230, supplier: 'محل عبده لليبياس', dateAdded: new Date().toISOString() },
+        { id: 'INV-2', name: 'افشور Samsung A51', category: 'افشور', qty: 2, buyPrice: 260, sellPrice: 380, supplier: 'درب غلف', dateAdded: new Date().toISOString() },
+        { id: 'INV-3', name: 'افشور iPhone 11', category: 'افشور', qty: 2, buyPrice: 300, sellPrice: 450, supplier: 'درب غلف', dateAdded: new Date().toISOString() },
+        { id: 'INV-4', name: 'بطارية iPhone 11', category: 'باتري', qty: 3, buyPrice: 120, sellPrice: 220, supplier: 'محل عبده لليبياس', dateAdded: new Date().toISOString() },
+        { id: 'INV-5', name: 'بطارية Samsung A12', category: 'باتري', qty: 5, buyPrice: 80, sellPrice: 150, supplier: 'محل عبده لليبياس', dateAdded: new Date().toISOString() },
+        { id: 'INV-6', name: 'زجاج حماية 5D Incassable', category: '5D', qty: 20, buyPrice: 8, sellPrice: 30, supplier: 'درب غلف', dateAdded: new Date().toISOString() },
+        { id: 'INV-7', name: 'شاحن 20W Type-C أصلي', category: 'شارجورات', qty: 6, buyPrice: 35, sellPrice: 80, supplier: 'درب غلف', dateAdded: new Date().toISOString() },
+        { id: 'INV-8', name: 'كابل آيفون أصلي', category: 'شارجورات', qty: 10, buyPrice: 15, sellPrice: 40, supplier: 'درب غلف', dateAdded: new Date().toISOString() }
+      ];
+
       const state = {
         currentView: 'sales',
         creditSubView: 'customers',
@@ -1570,6 +1818,9 @@
         userPins: Object.assign({}, DEFAULT_USER_PINS),
         sales: [],
         stockNeeds: [],
+        inventory: [],
+        inventoryCatFilter: 'all',
+        inventorySearchQuery: '',
         creditCustomers: [],
         debtSuppliers: [],
         presets: DEFAULT_PRESETS,
@@ -1708,6 +1959,7 @@
           let loadedStock = localStorage.getItem(STORAGE_KEYS.STOCK_NEEDS);
           let loadedCreditCust = localStorage.getItem(STORAGE_KEYS.CREDIT_CUSTOMERS);
           let loadedDebtSupp = localStorage.getItem(STORAGE_KEYS.DEBT_SUPPLIERS);
+          let loadedInventory = localStorage.getItem(STORAGE_KEYS.INVENTORY);
           let loadedPins = localStorage.getItem(STORAGE_KEYS.USER_PINS);
           let loadedWholesale = localStorage.getItem(STORAGE_KEYS.WHOLESALE_CATALOG);
 
@@ -1837,6 +2089,12 @@
             }
           }
 
+          if (loadedInventory) {
+            try { state.inventory = JSON.parse(loadedInventory); } catch (e) { state.inventory = DEFAULT_INVENTORY; }
+          } else {
+            state.inventory = DEFAULT_INVENTORY;
+          }
+
           if (loadedPins) {
             try { state.userPins = Object.assign({}, DEFAULT_USER_PINS, JSON.parse(loadedPins)); } catch (e) {}
           }
@@ -1864,6 +2122,7 @@
           state.lastUpdated = Date.now();
           localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(state.sales));
           localStorage.setItem(STORAGE_KEYS.STOCK_NEEDS, JSON.stringify(state.stockNeeds));
+          localStorage.setItem(STORAGE_KEYS.INVENTORY, JSON.stringify(state.inventory));
           localStorage.setItem(STORAGE_KEYS.CREDIT_CUSTOMERS, JSON.stringify(state.creditCustomers));
           localStorage.setItem(STORAGE_KEYS.DEBT_SUPPLIERS, JSON.stringify(state.debtSuppliers));
           localStorage.setItem(STORAGE_KEYS.PRESETS, JSON.stringify(state.presets));
@@ -2072,6 +2331,12 @@
               changed = true;
             }
           }
+          if (Array.isArray(payload.inventory)) {
+            if (JSON.stringify(payload.inventory) !== JSON.stringify(state.inventory)) {
+              state.inventory = payload.inventory;
+              changed = true;
+            }
+          }
           if (Array.isArray(payload.creditCustomers)) {
             const sanitizedCust = payload.creditCustomers.map(c => {
               if (!c.id) c.id = 'CRD-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000);
@@ -2130,6 +2395,7 @@
           const payload = {
             sales: state.sales,
             stockNeeds: state.stockNeeds,
+            inventory: state.inventory,
             creditCustomers: state.creditCustomers,
             debtSuppliers: state.debtSuppliers,
             presets: state.presets,
@@ -2188,36 +2454,45 @@
         const btnSales = document.getElementById('nav-btn-sales');
         const btnStock = document.getElementById('nav-btn-stock');
         const btnCredit = document.getElementById('nav-btn-credit');
+        const btnInv = document.getElementById('nav-btn-inventory');
 
         const viewSales = document.getElementById('view-sales-page');
         const viewStock = document.getElementById('view-stock-page');
         const viewCredit = document.getElementById('view-credit-page');
+        const viewInv = document.getElementById('view-inventory-page');
 
         function switchMainTab(target) {
           state.currentView = target;
-          [btnSales, btnStock, btnCredit].forEach(b => {
-            b.className = 'page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition cursor-pointer';
+          [btnSales, btnStock, btnCredit, btnInv].forEach(b => {
+            if (b) b.className = 'page-nav-btn py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center justify-center gap-1 transition cursor-pointer';
           });
-          [viewSales, viewStock, viewCredit].forEach(v => v.classList.add('hidden'));
+          [viewSales, viewStock, viewCredit, viewInv].forEach(v => {
+            if (v) v.classList.add('hidden');
+          });
 
           if (target === 'sales') {
-            btnSales.className = 'page-nav-btn active py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
-            viewSales.classList.remove('hidden');
+            if (btnSales) btnSales.className = 'page-nav-btn active py-2 rounded-xl bg-emerald-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
+            if (viewSales) viewSales.classList.remove('hidden');
             renderAll();
           } else if (target === 'stock') {
-            btnStock.className = 'page-nav-btn active py-2 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
-            viewStock.classList.remove('hidden');
+            if (btnStock) btnStock.className = 'page-nav-btn active py-2 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
+            if (viewStock) viewStock.classList.remove('hidden');
             renderStockSection();
           } else if (target === 'credit') {
-            btnCredit.className = 'page-nav-btn active py-2 rounded-xl bg-rose-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
-            viewCredit.classList.remove('hidden');
+            if (btnCredit) btnCredit.className = 'page-nav-btn active py-2 rounded-xl bg-rose-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
+            if (viewCredit) viewCredit.classList.remove('hidden');
             renderCreditSection();
+          } else if (target === 'inventory') {
+            if (btnInv) btnInv.className = 'page-nav-btn active py-2 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1 shadow-sm transition font-black cursor-pointer';
+            if (viewInv) viewInv.classList.remove('hidden');
+            renderInventorySection();
           }
         }
 
         if (btnSales) btnSales.addEventListener('click', () => switchMainTab('sales'));
         if (btnStock) btnStock.addEventListener('click', () => switchMainTab('stock'));
         if (btnCredit) btnCredit.addEventListener('click', () => switchMainTab('credit'));
+        if (btnInv) btnInv.addEventListener('click', () => switchMainTab('inventory'));
       }
 
       // 5. Music Player Setup
@@ -4796,6 +5071,7 @@
         renderSalesList();
         renderStockSection();
         renderCreditSection();
+        renderInventorySection();
       }
 
       function setupSaleForm() {
@@ -5065,6 +5341,556 @@
         };
       }
 
+
+      // ==================== 12. INVENTORY (STOCK) MODULE ====================
+      function updateInventoryCategoryUI(cat) {
+        const select = document.getElementById('input-inventory-category');
+        const label = document.getElementById('label-active-inventory-cat');
+        if (select) select.value = cat;
+        if (label) label.textContent = cat;
+        document.querySelectorAll('#inv-form-cat-quick-pills .inv-form-cat-pill').forEach(btn => {
+          if (btn.getAttribute('data-cat') === cat) {
+            btn.className = 'inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-600 text-white shadow-xs shrink-0 cursor-pointer';
+          } else {
+            btn.className = 'inv-form-cat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 cursor-pointer';
+          }
+        });
+      }
+
+      function setupInventorySection() {
+        const form = document.getElementById('form-add-inventory');
+        const inputCat = document.getElementById('input-inventory-category');
+        const inputName = document.getElementById('input-inv-name');
+        const inputQty = document.getElementById('input-inv-qty');
+        const inputBuy = document.getElementById('input-inv-buy-price');
+        const inputSell = document.getElementById('input-inv-sell-price');
+        const inputSupplier = document.getElementById('input-inv-supplier');
+        const inputNotes = document.getElementById('input-inv-notes');
+        const btnInc = document.getElementById('btn-inc-inv-qty');
+        const btnDec = document.getElementById('btn-dec-inv-qty');
+        const searchInput = document.getElementById('input-search-inventory');
+        const clearSearchBtn = document.getElementById('btn-clear-inv-search');
+
+        // Quick category pills in add form
+        document.querySelectorAll('#inv-form-cat-quick-pills .inv-form-cat-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const cat = btn.getAttribute('data-cat');
+            updateInventoryCategoryUI(cat);
+          });
+        });
+
+        if (inputCat) {
+          inputCat.addEventListener('change', () => {
+            updateInventoryCategoryUI(inputCat.value);
+          });
+        }
+
+        // Auto-detect branch and prefill wholesale from catalog if available
+        if (inputName) {
+          inputName.addEventListener('input', () => {
+            const val = inputName.value.trim();
+            if (val.length >= 2) {
+              const detected = detectStockCategory(val);
+              updateInventoryCategoryUI(detected);
+              const norm = val.toLowerCase();
+              if (inputBuy && (!inputBuy.value || inputBuy.value === '0')) {
+                const savedW = getSavedWholesalePrice(norm);
+                if (savedW > 0) inputBuy.value = savedW;
+              }
+            }
+          });
+        }
+
+        if (btnInc && inputQty) {
+          btnInc.addEventListener('click', () => {
+            inputQty.value = parseInt(inputQty.value || 1, 10) + 1;
+          });
+        }
+        if (btnDec && inputQty) {
+          btnDec.addEventListener('click', () => {
+            const cur = parseInt(inputQty.value || 1, 10);
+            if (cur > 1) inputQty.value = cur - 1;
+          });
+        }
+
+        if (searchInput) {
+          searchInput.addEventListener('input', () => {
+            state.inventorySearchQuery = searchInput.value.trim().toLowerCase();
+            if (clearSearchBtn) {
+              if (state.inventorySearchQuery) clearSearchBtn.classList.remove('hidden');
+              else clearSearchBtn.classList.add('hidden');
+            }
+            renderInventoryItems();
+          });
+        }
+
+        if (clearSearchBtn && searchInput) {
+          clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            state.inventorySearchQuery = '';
+            clearSearchBtn.classList.add('hidden');
+            renderInventoryItems();
+            searchInput.focus();
+          });
+        }
+
+        if (form) {
+          form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = (inputName?.value || '').trim();
+            const category = inputCat ? inputCat.value : detectStockCategory(name);
+            const qty = Math.max(1, parseInt(inputQty?.value || 1, 10));
+            const buyPrice = Math.max(0, parseFloat(inputBuy?.value || 0));
+            const sellPrice = Math.max(0, parseFloat(inputSell?.value || 0));
+            const supplier = (inputSupplier?.value || '').trim();
+            const notes = (inputNotes?.value || '').trim();
+
+            if (!name) {
+              showToast('يرجى كتابة اسم السلعة أو الموديل!', true);
+              inputName?.focus();
+              return;
+            }
+
+            // Check if item already exists in inventory (same name and category)
+            let existing = state.inventory.find(i => i.name.trim().toLowerCase() === name.toLowerCase() && i.category === category);
+            if (existing) {
+              existing.qty += qty;
+              if (sellPrice > 0) existing.sellPrice = sellPrice;
+              if (state.isManager && buyPrice > 0) existing.buyPrice = buyPrice;
+              if (supplier) existing.supplier = supplier;
+              if (notes) existing.notes = notes;
+              showToast(`تمت زيادة ${qty} قطع فالمخزون لـ "${name}" (المجموع: ${existing.qty}) ✅`);
+            } else {
+              const newItem = {
+                id: 'INV-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                name: name,
+                category: category,
+                qty: qty,
+                buyPrice: buyPrice,
+                sellPrice: sellPrice,
+                supplier: supplier,
+                notes: notes,
+                addedBy: state.activeUser || 'المحل',
+                dateAdded: new Date().toISOString()
+              };
+              state.inventory.unshift(newItem);
+              showToast(`تم تقييد "${name}" (${qty} قطع) فـ فرع (${category}) بنجاح! 📥📦`);
+            }
+
+            // Also save buyPrice into wholesaleCatalog for manager
+            if (buyPrice > 0) {
+              const norm = name.toLowerCase();
+              state.wholesaleCatalog[norm] = buyPrice;
+            }
+
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+            playCashSound();
+
+            if (inputName) inputName.value = '';
+            if (inputQty) inputQty.value = '1';
+            if (inputBuy) inputBuy.value = '';
+            if (inputSell) inputSell.value = '';
+            if (inputSupplier) inputSupplier.value = '';
+            if (inputNotes) inputNotes.value = '';
+            if (inputName) inputName.focus();
+
+            renderInventorySection();
+          });
+        }
+
+        // Setup Edit Inventory Modal
+        const modalEditInv = document.getElementById('modal-edit-inventory');
+        const formEditInv = document.getElementById('form-edit-inventory');
+        const closeEditInv = document.getElementById('btn-close-edit-inv-modal');
+        const cancelEditInv = document.getElementById('btn-cancel-edit-inv');
+
+        function hideEditInvModal() {
+          if (modalEditInv) modalEditInv.classList.add('hidden');
+        }
+        if (closeEditInv) closeEditInv.addEventListener('click', hideEditInvModal);
+        if (cancelEditInv) cancelEditInv.addEventListener('click', hideEditInvModal);
+
+        if (formEditInv) {
+          formEditInv.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-inv-id')?.value;
+            const target = state.inventory.find(i => i.id === id);
+            if (!target) return;
+
+            const name = (document.getElementById('edit-inv-name')?.value || '').trim();
+            const category = document.getElementById('edit-inv-category')?.value || 'افشور';
+            const qty = Math.max(0, parseInt(document.getElementById('edit-inv-qty')?.value || 0, 10));
+            const sellPrice = Math.max(0, parseFloat(document.getElementById('edit-inv-sell-price')?.value || 0));
+            const supplier = (document.getElementById('edit-inv-supplier')?.value || '').trim();
+
+            target.name = name;
+            target.category = category;
+            target.qty = qty;
+            target.sellPrice = sellPrice;
+            target.supplier = supplier;
+
+            if (state.isManager) {
+              const buyPrice = Math.max(0, parseFloat(document.getElementById('edit-inv-buy-price')?.value || 0));
+              target.buyPrice = buyPrice;
+              if (buyPrice > 0) state.wholesaleCatalog[name.toLowerCase()] = buyPrice;
+            }
+
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+            playCashSound();
+            showToast(`تم حفظ تعديل سلعة المخزون "${name}" بنجاح! ✏️`);
+            hideEditInvModal();
+            renderInventorySection();
+          });
+        }
+      }
+
+      function openEditInventoryModal(item) {
+        if (!item) return;
+        const modal = document.getElementById('modal-edit-inventory');
+        const idInp = document.getElementById('edit-inv-id');
+        const catSelect = document.getElementById('edit-inv-category');
+        const nameInp = document.getElementById('edit-inv-name');
+        const qtyInp = document.getElementById('edit-inv-qty');
+        const buyInp = document.getElementById('edit-inv-buy-price');
+        const sellInp = document.getElementById('edit-inv-sell-price');
+        const suppInp = document.getElementById('edit-inv-supplier');
+
+        if (idInp) idInp.value = item.id;
+        if (catSelect) catSelect.value = item.category || 'افشور';
+        if (nameInp) nameInp.value = item.name;
+        if (qtyInp) qtyInp.value = item.qty;
+        if (sellInp) sellInp.value = item.sellPrice || 0;
+        if (suppInp) suppInp.value = item.supplier || '';
+
+        if (buyInp) {
+          if (state.isManager) {
+            buyInp.value = item.buyPrice || 0;
+            buyInp.removeAttribute('disabled');
+            buyInp.parentElement.classList.remove('hidden');
+          } else {
+            buyInp.value = '';
+            buyInp.setAttribute('disabled', 'disabled');
+            buyInp.parentElement.classList.add('hidden');
+          }
+        }
+
+        if (modal) modal.classList.remove('hidden');
+        if (nameInp) setTimeout(() => nameInp.focus(), 150);
+      }
+
+      function renderInventoryKPIs() {
+        const totalItemsEl = document.getElementById('kpi-inventory-total-items');
+        const typesCountEl = document.getElementById('kpi-inventory-types-count');
+        const totalCostEl = document.getElementById('kpi-inventory-total-cost');
+        const totalSellEl = document.getElementById('kpi-inventory-total-sell');
+        const totalProfitEl = document.getElementById('kpi-inventory-total-profit');
+        const badgeInv = document.getElementById('badge-inventory-count');
+
+        const totalQty = state.inventory.reduce((acc, i) => acc + (Number(i.qty) || 0), 0);
+        const totalTypes = state.inventory.length;
+
+        if (totalItemsEl) totalItemsEl.textContent = totalQty;
+        if (typesCountEl) typesCountEl.textContent = `${totalTypes} نوع / موديل مسجل`;
+        if (badgeInv) badgeInv.textContent = totalQty;
+
+        if (state.isManager) {
+          const totalCost = state.inventory.reduce((acc, i) => acc + ((Number(i.buyPrice) || 0) * (Number(i.qty) || 0)), 0);
+          const totalSell = state.inventory.reduce((acc, i) => acc + ((Number(i.sellPrice) || 0) * (Number(i.qty) || 0)), 0);
+          const expectedProfit = totalSell - totalCost;
+
+          if (totalCostEl) totalCostEl.textContent = `${totalCost.toFixed(0)} DH`;
+          if (totalSellEl) totalSellEl.textContent = `${totalSell.toFixed(0)} DH`;
+          if (totalProfitEl) totalProfitEl.textContent = `${expectedProfit.toFixed(0)} DH`;
+        } else {
+          if (totalCostEl) totalCostEl.textContent = '🔒 خاص بالمدير';
+          if (totalSellEl) totalSellEl.textContent = '🔒 خاص بالمدير';
+          if (totalProfitEl) totalProfitEl.textContent = '🔒 خاص بالمدير';
+        }
+
+        // Lock or show buy price input in add stock form
+        const addBuyInp = document.getElementById('input-inv-buy-price');
+        if (addBuyInp) {
+          if (state.isManager) {
+            addBuyInp.removeAttribute('disabled');
+            addBuyInp.placeholder = '150';
+            addBuyInp.className = 'w-full p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-center text-xs font-black text-amber-900 focus:bg-white focus:border-amber-500 outline-none';
+          } else {
+            addBuyInp.setAttribute('disabled', 'disabled');
+            addBuyInp.placeholder = '🔒 للمدير فقط';
+            addBuyInp.value = '';
+            addBuyInp.className = 'w-full p-2.5 bg-slate-100 border border-slate-300 rounded-xl text-center text-xs font-bold text-slate-400 outline-none cursor-not-allowed';
+          }
+        }
+      }
+
+      function renderInventoryCategoryFilterBar() {
+        const bar = document.getElementById('inventory-category-filter-bar');
+        if (!bar) return;
+
+        const counts = {};
+        let totalItems = 0;
+        state.inventory.forEach(i => {
+          const c = i.category || 'افشور';
+          const q = Number(i.qty || 0);
+          counts[c] = (counts[c] || 0) + q;
+          totalItems += q;
+        });
+
+        const cats = [
+          { key: 'all', label: 'الكل', icon: '✨', count: totalItems },
+          { key: 'افشور', label: 'افشورات', icon: '📱', count: counts['افشور'] || 0 },
+          { key: 'باتري', label: 'باتري', icon: '🔋', count: counts['باتري'] || 0 },
+          { key: '5D', label: '5D', icon: '🛡️', count: counts['5D'] || 0 },
+          { key: 'زاج عادي', label: 'زاج عادي', icon: '🔲', count: counts['زاج عادي'] || 0 },
+          { key: 'بوشيط', label: 'بوشيط', icon: '💼', count: counts['بوشيط'] || 0 },
+          { key: 'شارجورات', label: 'شارجورات', icon: '🔌', count: counts['شارجورات'] || 0 },
+          { key: 'اكسسوارات', label: 'اكسسوارات', icon: '🎧', count: counts['اكسسوارات'] || 0 },
+          { key: 'هواتف', label: 'هواتف', icon: '📲', count: counts['هواتف'] || 0 },
+          { key: 'اصلاح الهاتف', label: 'اصلاح', icon: '🔧', count: counts['اصلاح الهاتف'] || 0 }
+        ];
+
+        bar.innerHTML = cats.map(c => {
+          const active = state.inventoryCatFilter === c.key;
+          return `
+            <button type="button" data-cat="${c.key}"
+              class="inv-cat-filter-btn px-2.5 py-1.5 rounded-xl whitespace-nowrap transition flex items-center gap-1 cursor-pointer ${
+                active ? 'bg-blue-600 text-white font-black shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold'
+              }">
+              <span>${c.icon}</span>
+              <span>${c.label}</span>
+              <span class="text-[10px] px-1.5 rounded-full ${active ? 'bg-white text-blue-900' : 'bg-slate-200 text-slate-700'} font-black">${c.count}</span>
+            </button>
+          `;
+        }).join('');
+
+        bar.querySelectorAll('.inv-cat-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.inventoryCatFilter = btn.getAttribute('data-cat');
+            renderInventoryCategoryFilterBar();
+            renderInventoryItems();
+          });
+        });
+      }
+
+      function renderInventoryItems() {
+        const container = document.getElementById('inventory-items-container');
+        const badge = document.getElementById('inv-items-badge-count');
+        if (!container) return;
+
+        let list = state.inventory;
+
+        if (state.inventoryCatFilter !== 'all') {
+          list = list.filter(i => (i.category || 'افشور') === state.inventoryCatFilter);
+        }
+
+        if (state.inventorySearchQuery) {
+          list = list.filter(i => {
+            const nameMatch = (i.name || '').toLowerCase().includes(state.inventorySearchQuery);
+            const suppMatch = (i.supplier || '').toLowerCase().includes(state.inventorySearchQuery);
+            const catMatch = (i.category || '').toLowerCase().includes(state.inventorySearchQuery);
+            return nameMatch || suppMatch || catMatch;
+          });
+        }
+
+        if (badge) badge.textContent = `${list.length} سلعة`;
+
+        if (list.length === 0) {
+          container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs font-bold">لا توجد سلع متوفرة فهاد الفرع أو البحث حالياً.</div>`;
+          return;
+        }
+
+        container.innerHTML = list.map(item => {
+          const cat = item.category || 'افشور';
+          const catInfo = STOCK_CATEGORIES_INFO[cat] || { icon: '📦', name: cat };
+          const qty = Number(item.qty || 0);
+          const buyPrice = Number(item.buyPrice || 0);
+          const sellPrice = Number(item.sellPrice || 0);
+          const unitProfit = sellPrice - buyPrice;
+          const totalStockProfit = unitProfit * qty;
+
+          let qtyBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+          let qtyLabel = `${qty} متوفرة`;
+          if (qty === 0) {
+            qtyBadgeClass = 'bg-red-100 text-red-700 border-red-200 font-black';
+            qtyLabel = '❌ نفذت (0)';
+          } else if (qty <= 3) {
+            qtyBadgeClass = 'bg-amber-100 text-amber-900 border-amber-300 font-black animate-pulse';
+            qtyLabel = `⚠️ باقين ${qty} فقط`;
+          }
+
+          const buyPriceDisplay = state.isManager
+            ? `<span class="bg-amber-50 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-lg text-[11px] font-bold">
+                 شراء: <strong>${buyPrice} DH</strong> | ربح: <strong class="${unitProfit >= 0 ? 'text-emerald-700' : 'text-red-600'}">${unitProfit} DH</strong>
+                 ${qty > 1 ? `<span class="text-[10px] text-slate-500 font-semibold">(مجموع ربحها: ${totalStockProfit.toFixed(0)} DH)</span>` : ''}
+               </span>`
+            : `<span class="bg-slate-100 text-slate-400 px-2 py-0.5 rounded-lg text-[11px] font-bold">شراء: 🔒 خاص بالمدير</span>`;
+
+          const deleteBtn = state.isManager
+            ? `<button type="button" class="delete-inv-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center font-bold text-xs transition cursor-pointer"
+                 data-id="${item.id}" title="مسح من المخزون">🗑️</button>`
+            : '';
+
+          return `
+            <div class="py-3 px-3 flex items-center justify-between gap-2.5 text-xs bg-white rounded-xl border border-slate-100 hover:border-slate-300 transition flex-wrap sm:flex-nowrap">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded">${catInfo.icon} ${cat}</span>
+                  <h4 class="font-extrabold text-slate-900 text-sm truncate">${item.name}</h4>
+                  <span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${qtyBadgeClass}">${qtyLabel}</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs mt-1.5 flex-wrap">
+                  <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg font-black text-xs">
+                    ثمن البيع 👥: <strong class="text-emerald-700 text-sm">${sellPrice} DH</strong>
+                  </span>
+                  ${buyPriceDisplay}
+                  ${item.supplier ? `<span class="text-[10px] text-slate-500 font-semibold">🏪 المورد: ${item.supplier}</span>` : ''}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap shrink-0">
+                <!-- Quantity adjusters -->
+                <div class="flex items-center bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
+                  <button type="button" class="dec-item-qty-btn px-2 py-1 text-slate-700 hover:bg-slate-200 font-black text-xs cursor-pointer" data-id="${item.id}" title="إنقاص قطعة">-</button>
+                  <span class="px-2 font-black text-xs text-blue-700">${qty}</span>
+                  <button type="button" class="inc-item-qty-btn px-2 py-1 text-slate-700 hover:bg-slate-200 font-black text-xs cursor-pointer" data-id="${item.id}" title="زيادة قطعة">+</button>
+                </div>
+
+                <!-- Fast Sell Button: switches to sales tab and prefills item -->
+                <button type="button" class="quick-sell-inv-btn px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-xs"
+                  data-id="${item.id}" title="بيع هاد السلعة دابا">
+                  <span>💰</span> <span>بيع</span>
+                </button>
+
+                <!-- Send to Missing Stock if running low -->
+                <button type="button" class="send-inv-to-needs-btn px-2 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-black rounded-xl text-xs transition flex items-center gap-1 cursor-pointer"
+                  data-id="${item.id}" title="طلب هاد السلعة فـ السلعة لي خاصا">
+                  <span>📋</span> <span>خاصانا</span>
+                </button>
+
+                <!-- Edit and Delete -->
+                <button type="button" class="edit-inv-btn w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs border border-blue-200 cursor-pointer"
+                  data-id="${item.id}" title="تعديل">✏️</button>
+                ${deleteBtn}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Action listeners
+        container.querySelectorAll('.inc-item-qty-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.inventory.find(i => i.id === id);
+            if (item) {
+              item.qty = (Number(item.qty) || 0) + 1;
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+              renderInventorySection();
+            }
+          });
+        });
+
+        container.querySelectorAll('.dec-item-qty-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.inventory.find(i => i.id === id);
+            if (item && item.qty > 0) {
+              item.qty = item.qty - 1;
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+              renderInventorySection();
+            }
+          });
+        });
+
+        container.querySelectorAll('.quick-sell-inv-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.inventory.find(i => i.id === id);
+            if (!item) return;
+
+            // Switch to sales tab
+            const btnSales = document.getElementById('nav-btn-sales');
+            if (btnSales) btnSales.click();
+
+            // Prefill sales form
+            const nameInp = document.getElementById('input-item-name');
+            const priceInp = document.getElementById('input-item-price');
+            const qtyInp = document.getElementById('input-item-qty');
+            const cat = item.category || detectStockCategory(item.name);
+            updateSaleCategoryUI(cat);
+            if (nameInp) nameInp.value = item.name;
+            if (priceInp) priceInp.value = item.sellPrice || '';
+            if (qtyInp) qtyInp.value = '1';
+
+            showToast(`تم تحويل السلعة "${item.name}" لـ استمارة المبيعات! 💰`);
+            if (priceInp) priceInp.focus();
+          });
+        });
+
+        container.querySelectorAll('.send-inv-to-needs-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.inventory.find(i => i.id === id);
+            if (!item) return;
+
+            const existingNeed = state.stockNeeds.find(n => n.name.trim().toLowerCase() === item.name.trim().toLowerCase() && n.status !== 'bought');
+            if (existingNeed) {
+              existingNeed.qty += 1;
+              showToast(`تمت زيادة الكمية المطلوبة فـ السلعة لي خاصا لـ "${item.name}" 📋`);
+            } else {
+              state.stockNeeds.unshift({
+                id: 'STK-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                name: item.name,
+                category: item.category || 'افشور',
+                qty: 1,
+                priority: 'عادي',
+                addedBy: state.activeUser || 'المحل',
+                date: new Date().toISOString(),
+                status: 'pending'
+              });
+              showToast(`تم إرسال "${item.name}" إلى السلعة لي خاصا بنجاح! 📋`);
+            }
+            saveLocalState();
+            if (state.syncToCloud) state.syncToCloud();
+            playCashSound();
+            renderStockSection();
+          });
+        });
+
+        container.querySelectorAll('.edit-inv-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const item = state.inventory.find(i => i.id === id);
+            if (item) openEditInventoryModal(item);
+          });
+        });
+
+        container.querySelectorAll('.delete-inv-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!state.isManager) return;
+            const id = btn.getAttribute('data-id');
+            const item = state.inventory.find(i => i.id === id);
+            const itemName = item ? item.name : '';
+            showConfirmDialog(`هل أنت متأكد من حذف "${itemName}" من المخزون؟`, () => {
+              state.inventory = state.inventory.filter(i => i.id !== id);
+              saveLocalState();
+              if (state.syncToCloud) state.syncToCloud();
+              renderInventorySection();
+              showToast(`تم حذف "${itemName}" من المخزون 🗑️`);
+            });
+          });
+        });
+      }
+
+      function renderInventorySection() {
+        renderInventoryKPIs();
+        renderInventoryCategoryFilterBar();
+        renderInventoryItems();
+      }
+
       function setupManagerSpace() {
         const modal = document.getElementById('manager-modal');
         const openBtn = document.getElementById('open-manager-btn');
@@ -5152,6 +5978,7 @@
               exportedBy: state.activeUser || 'نورالدين',
               sales: state.sales,
               stockNeeds: state.stockNeeds,
+              inventory: state.inventory,
               creditCustomers: state.creditCustomers,
               debtSuppliers: state.debtSuppliers,
               presets: state.presets,
@@ -5190,6 +6017,7 @@
                 if (!data || typeof data !== 'object') throw new Error('ملف غير صالح');
                 if (Array.isArray(data.sales)) state.sales = data.sales;
                 if (Array.isArray(data.stockNeeds)) state.stockNeeds = data.stockNeeds;
+                if (Array.isArray(data.inventory)) state.inventory = data.inventory;
                 if (Array.isArray(data.creditCustomers)) {
                   state.creditCustomers = data.creditCustomers.map(c => {
                     updateCustomerRecordTotals(c);
@@ -5438,6 +6266,7 @@
         setupSaleForm();
         setupStockSection();
         setupCreditSection();
+        setupInventorySection();
         setupManagerSpace();
         setupNewFeaturesModals();
         updateUserHeader();
@@ -5457,4 +6286,4 @@
     })();
   </script>
 </body>
-  </html>
+</html>
