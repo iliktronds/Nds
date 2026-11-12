@@ -954,11 +954,11 @@
           </div>
 
           <!-- Search & Filter Controls -->
-          <div class="flex items-center gap-1.5 flex-1 max-w-xs justify-end">
+          <div class="flex items-center gap-1.5 w-full sm:w-64 justify-end">
             <div class="relative w-full">
               <input type="text" id="input-search-inventory" placeholder="🔍 بحث باسم السلعة أو الموديل..."
-                class="w-full py-1.5 pr-2 pl-6 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:bg-white focus:border-blue-400">
-              <button type="button" id="btn-clear-inv-search" class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs hidden cursor-pointer">✕</button>
+                class="w-full py-2 pr-3 pl-7 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:bg-white focus:border-blue-400">
+              <button type="button" id="btn-clear-inv-search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs hidden cursor-pointer">✕</button>
             </div>
           </div>
         </div>
@@ -4329,13 +4329,26 @@
         }
       }
 
-      function renderKPIs() {
-        const todayStr = new Date().toDateString();
-        const todaySales = state.sales.filter(s => new Date(s.date).toDateString() === todayStr);
+      function getEffectiveSaleDate(s) {
+        if (!s) return '';
+        if ((s.deliveryStatus || 'delivered') !== 'in_shop') {
+          return s.deliveredAt || s.date;
+        }
+        return s.date;
+      }
 
-        // Separate delivered sales (realized) vs in_shop (pending delivery/payment)
-        const deliveredSales = todaySales.filter(s => (s.deliveryStatus || 'delivered') !== 'in_shop');
-        const inShopSales = todaySales.filter(s => s.deliveryStatus === 'in_shop');
+      function renderKPIs() {
+        const todayYMD = getTodayYMD();
+
+        // Realized delivered sales: counted on the exact day they were delivered/picked up (s.deliveredAt || s.date)
+        const deliveredSales = state.sales.filter(s => {
+          if ((s.deliveryStatus || 'delivered') === 'in_shop') return false;
+          return getSaleDateYMD(s.deliveredAt || s.date) === todayYMD;
+        });
+        // In-shop items recorded today (not yet delivered/paid)
+        const inShopSales = state.sales.filter(s => {
+          return s.deliveryStatus === 'in_shop' && getSaleDateYMD(s.date) === todayYMD;
+        });
 
         const todayDeliveredQty = deliveredSales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
         const todayInShopQty = inShopSales.reduce((acc, s) => acc + (Number(s.qty) || 1), 0);
@@ -4406,9 +4419,9 @@
         }
         panel.classList.remove('hidden');
 
-        const todayStr = new Date().toDateString();
+        const todayYMD = getTodayYMD();
         const targetSales = state.wholesaleFilter === 'today'
-          ? state.sales.filter(s => new Date(s.date).toDateString() === todayStr)
+          ? state.sales.filter(s => getSaleDateYMD(getEffectiveSaleDate(s)) === todayYMD)
           : state.sales;
 
         // Separate delivered (counted in realized profit) vs in_shop (pending delivery)
@@ -4593,14 +4606,14 @@
         if (!Array.isArray(sales)) return [];
         if (filterType === 'today') {
           const todayYMD = getTodayYMD();
-          return sales.filter(s => getSaleDateYMD(s.date) === todayYMD);
+          return sales.filter(s => getSaleDateYMD(getEffectiveSaleDate(s)) === todayYMD);
         }
         if (filterType === 'yesterday') {
           const yestYMD = getYesterdayYMD();
-          return sales.filter(s => getSaleDateYMD(s.date) === yestYMD);
+          return sales.filter(s => getSaleDateYMD(getEffectiveSaleDate(s)) === yestYMD);
         }
         if (filterType === 'custom' && customDate) {
-          return sales.filter(s => getSaleDateYMD(s.date) === customDate);
+          return sales.filter(s => getSaleDateYMD(getEffectiveSaleDate(s)) === customDate);
         }
         return sales;
       }
@@ -4994,27 +5007,46 @@
               data-id="${s.id}" title="مسح هذه العملية">🗑️</button>
           ` : '';
 
+          const deliveredDateInfo = s.deliveredAt
+            ? (() => {
+                const dAt = new Date(s.deliveredAt);
+                const dAtDate = dAt.toLocaleDateString('ar-MA', { day: 'numeric', month: 'short' });
+                const dAtTime = dAt.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
+                return getSaleDateYMD(s.deliveredAt) !== getSaleDateYMD(s.date)
+                  ? `<span class="text-emerald-700 font-black bg-emerald-50 px-1.5 py-0.5 rounded">(خرج وتخلص: ${dAtDate} - ${dAtTime})</span>`
+                  : `<span class="text-emerald-700 font-bold">(خرج: ${dAtTime})</span>`;
+              })()
+            : '';
+
           return `
-            <div class="py-2.5 flex items-center justify-between gap-2 text-xs border-b border-slate-100 last:border-0 flex-wrap sm:flex-nowrap ${isInShop ? 'bg-amber-50/50 p-2 rounded-xl my-1 border border-amber-200/90' : ''}">
-              <div class="flex-1 min-w-0">
+            <div class="py-3 px-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs border-b border-slate-100 last:border-0 ${isInShop ? 'bg-amber-50/50 p-2.5 rounded-xl my-1 border border-amber-200/90' : ''}">
+              <div class="w-full sm:flex-1 min-w-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded">${catInfo.icon} ${cat}</span>
-                  <h4 class="font-extrabold text-slate-800 text-sm truncate">${s.name}</h4>
-                  <span class="bg-blue-100 text-blue-800 font-black text-[10px] px-1.5 py-0.5 rounded">${qty > 1 ? qty + 'x' : '1'}</span>
+                  <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded shrink-0">${catInfo.icon} ${cat}</span>
+                  <h4 class="font-extrabold text-slate-800 text-sm break-words">${s.name}</h4>
+                  <span class="bg-blue-100 text-blue-800 font-black text-[10px] px-1.5 py-0.5 rounded shrink-0">${qty > 1 ? qty + 'x' : '1'}</span>
                   ${statusBadge}
                 </div>
-                <p class="text-[10px] text-slate-400 mt-0.5">باعها: <strong class="text-slate-600 font-bold">${s.seller}</strong> | ${dateStr} - ${timeStr} ${s.deliveredAt ? `<span class="text-emerald-700 font-bold">(خرج: ${new Date(s.deliveredAt).toLocaleTimeString('ar-MA', {hour:'2-digit', minute:'2-digit'})})</span>` : ''}</p>
+                <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                  <span>باعها: <strong class="text-slate-600 font-bold">${s.seller}</strong></span>
+                  <span>| ${dateStr} - ${timeStr}</span>
+                  ${deliveredDateInfo}
+                </p>
               </div>
 
-              <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-end">
-                ${deliverBtn}
-                <button type="button" class="send-to-stock-btn px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-xl text-[11px] font-black transition flex items-center gap-1 cursor-pointer shrink-0"
-                  data-id="${s.id}">
-                  <span>📦</span> <span>السلعة لي خاصا</span>
-                </button>
-                ${priceDisplay}
-                ${editBtnHtml}
-                ${deleteBtnHtml}
+              <div class="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 flex-wrap pt-1 sm:pt-0 border-t border-slate-100 sm:border-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  ${deliverBtn}
+                  <button type="button" class="send-to-stock-btn px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-xl text-[11px] font-black transition flex items-center gap-1 cursor-pointer shrink-0"
+                    data-id="${s.id}">
+                    <span>📦</span> <span>السلعة لي خاصا</span>
+                  </button>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  ${priceDisplay}
+                  ${editBtnHtml}
+                  ${deleteBtnHtml}
+                </div>
               </div>
             </div>
           `;
@@ -5733,12 +5765,12 @@
             : '';
 
           return `
-            <div class="py-3 px-3 flex items-center justify-between gap-2.5 text-xs bg-white rounded-xl border border-slate-100 hover:border-slate-300 transition flex-wrap sm:flex-nowrap">
-              <div class="flex-1 min-w-0">
+            <div class="py-3 px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs bg-white rounded-xl border border-slate-100 hover:border-slate-300 transition">
+              <div class="w-full sm:flex-1 min-w-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded">${catInfo.icon} ${cat}</span>
-                  <h4 class="font-extrabold text-slate-900 text-sm truncate">${item.name}</h4>
-                  <span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${qtyBadgeClass}">${qtyLabel}</span>
+                  <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded shrink-0">${catInfo.icon} ${cat}</span>
+                  <h4 class="font-extrabold text-slate-900 text-sm break-words">${item.name}</h4>
+                  <span class="text-[10px] font-black px-2 py-0.5 rounded-full border shrink-0 ${qtyBadgeClass}">${qtyLabel}</span>
                 </div>
                 <div class="flex items-center gap-2 text-xs mt-1.5 flex-wrap">
                   <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg font-black text-xs">
@@ -5749,7 +5781,7 @@
                 </div>
               </div>
 
-              <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap shrink-0">
+              <div class="w-full sm:w-auto flex items-center justify-end gap-1.5 flex-wrap pt-2 sm:pt-0 border-t border-slate-100 sm:border-0 shrink-0">
                 <!-- Quantity adjusters -->
                 <div class="flex items-center bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
                   <button type="button" class="dec-item-qty-btn px-2 py-1 text-slate-700 hover:bg-slate-200 font-black text-xs cursor-pointer" data-id="${item.id}" title="إنقاص قطعة">-</button>
@@ -6148,6 +6180,8 @@
               sale.deliveryStatus = deliveryStatus;
               if (deliveryStatus === 'delivered' && !sale.deliveredAt) {
                 sale.deliveredAt = new Date().toISOString();
+              } else if (deliveryStatus === 'in_shop') {
+                sale.deliveredAt = null;
               }
 
               if (rememberW && wholesalePrice > 0) {
